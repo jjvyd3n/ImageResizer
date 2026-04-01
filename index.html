@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TikTok 9:16 Resizer</title>
+<title>TikTok 9:16 Resizer (Fit)</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 <style>
 body {
@@ -13,47 +13,17 @@ body {
   padding: 20px;
   color: #333;
 }
-h2 {
-  margin-bottom: 25px;
-  font-weight: 600;
-  color: #fff;
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-}
-#drop-area {
-  border: 2px dashed #fff;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.2);
-  padding: 50px 20px;
-  margin-bottom: 25px;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-  cursor: pointer;
-}
+h2 { margin-bottom: 25px; font-weight:600; color:#fff; text-shadow:1px1px4px rgba(0,0,0,0.3);}
+#drop-area { border:2px dashed #fff; border-radius:15px; background: rgba(255,255,255,0.2); padding:50px 20px; margin-bottom:25px; box-shadow:0 8px 15px rgba(0,0,0,0.2); cursor:pointer;}
 #drop-area.dragover { background: rgba(255,255,255,0.35); transform: scale(1.02);}
-.gallery {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 420px;
-  margin: 0 auto;
-}
-.canvas-container {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-.resized-img {
-  width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-@media (max-width:500px) {
-  #drop-area { padding: 40px 15px; }
-  .canvas-container { max-width: 95%; }
-}
+.gallery { display:flex; flex-direction:column; gap:20px; max-width:420px; margin:0 auto;}
+.canvas-container { border-radius:12px; overflow:hidden; box-shadow:0 6px 12px rgba(0,0,0,0.15);}
+.resized-img { width:100%; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.15);}
+@media (max-width:500px){ #drop-area{padding:40px 15px;} .canvas-container{max-width:95%;}}
 </style>
 </head>
 <body>
-<h2>TikTok 9:16 Resizer</h2>
+<h2>TikTok 9:16 Resizer (Fit)</h2>
 <div id="drop-area">Tap or Drop Images Here</div>
 <div class="gallery" id="output"></div>
 <script>
@@ -73,7 +43,7 @@ dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classL
 dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
 dropArea.addEventListener('drop', e => { e.preventDefault(); dropArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
 
-function handleFiles(files) {
+function handleFiles(files){
   Array.from(files).forEach(file => {
     if (!file.type.startsWith('image/')) return;
     const reader = new FileReader();
@@ -86,33 +56,33 @@ function handleFiles(files) {
   });
 }
 
-function processImage(img) {
+function processImage(img){
   const container = document.createElement('div');
-  container.className = 'canvas-container';
+  container.className='canvas-container';
 
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
-  // Crop to 9:16
-  const targetRatio = 9/16;
-  let targetWidth, targetHeight;
-  if (img.width / img.height > targetRatio) {
-    targetHeight = img.height;
-    targetWidth = targetHeight * targetRatio;
-  } else {
-    targetWidth = img.width;
-    targetHeight = targetWidth / targetRatio;
-  }
+  // TikTok 9:16 canvas
+  const canvasWidth = 540; // you can adjust pixel size
+  const canvasHeight = 960;
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
 
-  canvas.width = targetWidth;
-  canvas.height = targetHeight;
+  // Fit image inside canvas
+  const scale = Math.min(canvasWidth/img.width, canvasHeight/img.height);
+  const imgWidth = img.width * scale;
+  const imgHeight = img.height * scale;
+  const dx = (canvasWidth - imgWidth)/2;
+  const dy = (canvasHeight - imgHeight)/2;
 
-  const sx = (img.width - targetWidth) / 2;
-  const sy = (img.height - targetHeight) / 2;
+  // Optional background (white)
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0,0,canvasWidth,canvasHeight);
 
-  ctx.drawImage(img, sx, sy, targetWidth, targetHeight, 0, 0, targetWidth, targetHeight);
+  ctx.drawImage(img, 0,0,img.width,img.height, dx, dy, imgWidth, imgHeight);
 
-  // Convert to <img> for iPhone-friendly save
+  // Convert to <img> for iPhone-friendly saving
   const finalImg = new Image();
   finalImg.src = canvas.toDataURL('image/png', 1);
   finalImg.className = 'resized-img';
