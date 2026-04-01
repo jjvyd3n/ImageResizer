@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TikTok 9:16 Resizer Toggle</title>
+<title>TikTok 9:16 Resizer</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 <style>
 body {
@@ -16,7 +16,9 @@ body {
 h2 { margin-bottom: 10px; font-weight:600; color:#fff; text-shadow:1px1px4px rgba(0,0,0,0.3);}
 #drop-area { border:2px dashed #fff; border-radius:15px; background: rgba(255,255,255,0.2); padding:50px 20px; margin-bottom:15px; box-shadow:0 8px 15px rgba(0,0,0,0.2); cursor:pointer;}
 #drop-area.dragover { background: rgba(255,255,255,0.35); transform: scale(1.02);}
-.toggle-container { margin-bottom: 25px; color: #fff; font-weight:600;}
+.toggle-container { margin-bottom: 25px; color: #fff; font-weight:600; }
+.toggle-container button { margin:0 5px; padding:8px 16px; border:none; border-radius:8px; font-weight:600; cursor:pointer; background: rgba(255,255,255,0.7); color:#333; transition:0.2s;}
+.toggle-container button.active { background: rgba(0,0,0,0.8); color:#fff;}
 .gallery { display:flex; flex-direction:column; gap:20px; max-width:420px; margin:0 auto;}
 .canvas-container { border-radius:12px; overflow:hidden; box-shadow:0 6px 12px rgba(0,0,0,0.15);}
 .resized-img { width:100%; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.15);}
@@ -26,18 +28,22 @@ h2 { margin-bottom: 10px; font-weight:600; color:#fff; text-shadow:1px1px4px rgb
 <body>
 <h2>TikTok 9:16 Resizer</h2>
 <div class="toggle-container">
-  Mode: 
-  <select id="mode-select">
-    <option value="stretch">Stretch (Distort)</option>
-    <option value="fit">Fit (Keep Aspect)</option>
-  </select>
+  Mode:
+  <button id="stretch-btn" class="active">Stretch</button>
+  <button id="fit-btn">Fit (Blur Background)</button>
 </div>
 <div id="drop-area">Tap or Drop Images Here</div>
 <div class="gallery" id="output"></div>
 <script>
+let currentMode = 'stretch';
+
 const dropArea = document.getElementById('drop-area');
 const output = document.getElementById('output');
-const modeSelect = document.getElementById('mode-select');
+const stretchBtn = document.getElementById('stretch-btn');
+const fitBtn = document.getElementById('fit-btn');
+
+stretchBtn.addEventListener('click', () => { currentMode='stretch'; stretchBtn.classList.add('active'); fitBtn.classList.remove('active'); });
+fitBtn.addEventListener('click', () => { currentMode='fit'; fitBtn.classList.add('active'); stretchBtn.classList.remove('active'); });
 
 dropArea.addEventListener('click', () => {
   const fileInput = document.createElement('input');
@@ -68,7 +74,6 @@ function handleFiles(files){
 function processImage(img){
   const container = document.createElement('div');
   container.className='canvas-container';
-
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
@@ -77,28 +82,28 @@ function processImage(img){
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
-  const mode = modeSelect.value;
-
-  if(mode === 'stretch'){
-    // Stretch to fill entire canvas (distorted)
+  if(currentMode==='stretch'){
+    // Stretch to fill entire canvas
     ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvasWidth, canvasHeight);
   } else {
-    // Fit mode: scale to fit, keep aspect
+    // Fit with blurred background
+    // Draw blurred background
+    ctx.filter = 'blur(25px)';
+    ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvasWidth, canvasHeight);
+    ctx.filter = 'none';
+    // Draw centered image with correct aspect ratio
     const scale = Math.min(canvasWidth / img.width, canvasHeight / img.height);
     const imgWidth = img.width * scale;
     const imgHeight = img.height * scale;
-    const dx = (canvasWidth - imgWidth) / 2;
-    const dy = (canvasHeight - imgHeight) / 2;
-    // Optional background
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0,0,canvasWidth,canvasHeight);
+    const dx = (canvasWidth - imgWidth)/2;
+    const dy = (canvasHeight - imgHeight)/2;
     ctx.drawImage(img, 0,0,img.width,img.height, dx, dy, imgWidth, imgHeight);
   }
 
   const finalImg = new Image();
-  finalImg.src = canvas.toDataURL('image/png', 1);
-  finalImg.className = 'resized-img';
-  finalImg.alt = 'TikTok 9:16 resized';
+  finalImg.src = canvas.toDataURL('image/png',1);
+  finalImg.className='resized-img';
+  finalImg.alt='TikTok 9:16 resized';
   container.appendChild(finalImg);
   output.appendChild(container);
 }
