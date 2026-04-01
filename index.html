@@ -3,28 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TikTok Resizer Pro</title>
+<title>TikTok Resizer</title>
 
 <style>
 body {
   margin:0;
   font-family: system-ui;
   background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  min-height:100vh;
   color:white;
-  text-align:center;
 }
 
+h1 {
+  text-align:center;
+  padding:15px 10px 5px;
+  font-size:20px;
+}
+
+/* TOP BAR */
 .topbar {
-  position:sticky;
-  top:0;
-  background: rgba(0,0,0,0.5);
-  padding:10px;
-  backdrop-filter: blur(10px);
-  z-index:10;
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  padding-bottom:10px;
 }
 
 button {
-  margin:5px;
   padding:8px 14px;
   border:none;
   border-radius:8px;
@@ -37,41 +42,48 @@ button {
   color:white;
 }
 
+/* DROP AREA */
 #drop {
-  margin:20px;
-  padding:40px;
+  margin:15px;
+  padding:30px;
   border:2px dashed white;
-  border-radius:15px;
+  border-radius:12px;
+  text-align:center;
 }
 
+/* GALLERY */
 .gallery {
   max-width:420px;
   margin:auto;
   display:flex;
   flex-direction:column;
   gap:15px;
+  padding-bottom:40px;
 }
 
 .item {
   position:relative;
   border-radius:12px;
   overflow:hidden;
-  animation: fadeIn 0.4s ease;
+  animation: fade 0.3s ease;
 }
 
-img {
+.item img {
   width:100%;
+  display:block;
 }
 
+/* DELETE */
 .delete {
   position:absolute;
-  top:8px;
-  right:8px;
+  top:6px;
+  right:6px;
   background:red;
   color:white;
   font-size:12px;
 }
 
+/* FULLSCREEN VIEWER */
 .viewer {
   position:fixed;
   inset:0;
@@ -87,21 +99,25 @@ img {
   max-height:100%;
 }
 
-@keyframes fadeIn {
-  from {opacity:0; transform: translateY(10px);}
+/* ANIMATION */
+@keyframes fade {
+  from {opacity:0; transform:translateY(10px);}
   to {opacity:1;}
 }
 </style>
 </head>
 <body>
 
+<h1>TikTok 9:16 Resizer</h1>
+
 <div class="topbar">
   <button id="stretch">Stretch</button>
   <button id="fit">Fit</button>
-  <button id="clear">Clear All</button>
+  <button id="clear">Clear</button>
 </div>
 
 <div id="drop">Tap or Drop Images</div>
+
 <div class="gallery" id="gallery"></div>
 
 <div class="viewer" id="viewer">
@@ -110,6 +126,7 @@ img {
 
 <script>
 let mode = localStorage.getItem("mode") || "stretch";
+let bgColor = "white";
 
 const stretchBtn = document.getElementById("stretch");
 const fitBtn = document.getElementById("fit");
@@ -120,12 +137,14 @@ const drop = document.getElementById("drop");
 const viewer = document.getElementById("viewer");
 const viewerImg = document.getElementById("viewerImg");
 
+/* UI STATE */
 function updateUI(){
   stretchBtn.classList.toggle("active", mode==="stretch");
   fitBtn.classList.toggle("active", mode==="fit");
 }
 updateUI();
 
+/* BUTTONS */
 stretchBtn.onclick = () => {
   mode="stretch";
   localStorage.setItem("mode", mode);
@@ -138,8 +157,9 @@ fitBtn.onclick = () => {
   updateUI();
 };
 
-clearBtn.onclick = () => gallery.innerHTML="";
+clearBtn.onclick = () => gallery.innerHTML = "";
 
+/* FILE INPUT */
 drop.onclick = () => {
   const input = document.createElement("input");
   input.type="file";
@@ -149,6 +169,7 @@ drop.onclick = () => {
   input.click();
 };
 
+/* HANDLE FILES */
 function handleFiles(files){
   [...files].forEach(file=>{
     const reader = new FileReader();
@@ -161,25 +182,29 @@ function handleFiles(files){
   });
 }
 
+/* PROCESS IMAGE */
 function process(img){
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
-  const W = 540, H = 960;
-  canvas.width=W;
-  canvas.height=H;
+  const W = 540;
+  const H = 960;
+
+  canvas.width = W;
+  canvas.height = H;
 
   if(mode==="stretch"){
     ctx.drawImage(img,0,0,W,H);
   } else {
-    // REAL blur fix (draw twice with scaling)
-    ctx.filter="blur(30px)";
+    // blur background
+    ctx.filter="blur(25px)";
     ctx.drawImage(img,0,0,W,H);
     ctx.filter="none";
 
     const scale = Math.min(W/img.width, H/img.height);
     const w = img.width*scale;
     const h = img.height*scale;
+
     const x = (W-w)/2;
     const y = (H-h)/2;
 
@@ -192,15 +217,15 @@ function process(img){
   div.className="item";
 
   const image = document.createElement("img");
-  image.src=url;
+  image.src = url;
 
-  // TAP → FULLSCREEN
+  /* FULLSCREEN */
   image.onclick = ()=>{
     viewer.style.display="flex";
-    viewerImg.src=url;
+    viewerImg.src = url;
   };
 
-  // DELETE
+  /* DELETE */
   const del = document.createElement("button");
   del.textContent="X";
   del.className="delete";
@@ -211,11 +236,11 @@ function process(img){
   gallery.appendChild(div);
 }
 
-// VIEWER CONTROLS
+/* VIEWER CLOSE */
 viewer.onclick = ()=> viewer.style.display="none";
 
-// SWIPE SUPPORT
-let startX=0;
+/* SWIPE */
+let startX = 0;
 
 viewer.addEventListener("touchstart", e=>{
   startX = e.touches[0].clientX;
@@ -223,15 +248,17 @@ viewer.addEventListener("touchstart", e=>{
 
 viewer.addEventListener("touchend", e=>{
   let endX = e.changedTouches[0].clientX;
+
   if(Math.abs(startX-endX)>50){
     let imgs = [...document.querySelectorAll(".item img")];
-    let current = imgs.findIndex(i=>i.src===viewerImg.src);
+    let i = imgs.findIndex(img=>img.src===viewerImg.src);
 
-    if(startX > endX && current < imgs.length-1){
-      viewerImg.src = imgs[current+1].src;
+    if(startX > endX && i < imgs.length-1){
+      viewerImg.src = imgs[i+1].src;
     }
-    if(startX < endX && current > 0){
-      viewerImg.src = imgs[current-1].src;
+
+    if(startX < endX && i > 0){
+      viewerImg.src = imgs[i-1].src;
     }
   }
 });
