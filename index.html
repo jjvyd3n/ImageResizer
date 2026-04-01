@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TikTok 9:16 Stretch Resizer</title>
+<title>TikTok 9:16 Resizer Toggle</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 <style>
 body {
@@ -13,9 +13,10 @@ body {
   padding: 20px;
   color: #333;
 }
-h2 { margin-bottom: 25px; font-weight:600; color:#fff; text-shadow:1px1px4px rgba(0,0,0,0.3);}
-#drop-area { border:2px dashed #fff; border-radius:15px; background: rgba(255,255,255,0.2); padding:50px 20px; margin-bottom:25px; box-shadow:0 8px 15px rgba(0,0,0,0.2); cursor:pointer;}
+h2 { margin-bottom: 10px; font-weight:600; color:#fff; text-shadow:1px1px4px rgba(0,0,0,0.3);}
+#drop-area { border:2px dashed #fff; border-radius:15px; background: rgba(255,255,255,0.2); padding:50px 20px; margin-bottom:15px; box-shadow:0 8px 15px rgba(0,0,0,0.2); cursor:pointer;}
 #drop-area.dragover { background: rgba(255,255,255,0.35); transform: scale(1.02);}
+.toggle-container { margin-bottom: 25px; color: #fff; font-weight:600;}
 .gallery { display:flex; flex-direction:column; gap:20px; max-width:420px; margin:0 auto;}
 .canvas-container { border-radius:12px; overflow:hidden; box-shadow:0 6px 12px rgba(0,0,0,0.15);}
 .resized-img { width:100%; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.15);}
@@ -23,12 +24,20 @@ h2 { margin-bottom: 25px; font-weight:600; color:#fff; text-shadow:1px1px4px rgb
 </style>
 </head>
 <body>
-<h2>TikTok 9:16 Stretch Resizer</h2>
+<h2>TikTok 9:16 Resizer</h2>
+<div class="toggle-container">
+  Mode: 
+  <select id="mode-select">
+    <option value="stretch">Stretch (Distort)</option>
+    <option value="fit">Fit (Keep Aspect)</option>
+  </select>
+</div>
 <div id="drop-area">Tap or Drop Images Here</div>
 <div class="gallery" id="output"></div>
 <script>
 const dropArea = document.getElementById('drop-area');
 const output = document.getElementById('output');
+const modeSelect = document.getElementById('mode-select');
 
 dropArea.addEventListener('click', () => {
   const fileInput = document.createElement('input');
@@ -63,20 +72,33 @@ function processImage(img){
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
-  // TikTok 9:16 canvas
-  const canvasWidth = 540;  // width in px
-  const canvasHeight = 960; // height in px
+  const canvasWidth = 540;
+  const canvasHeight = 960;
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
-  // Stretch image to fill entire canvas
-  ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvasWidth, canvasHeight);
+  const mode = modeSelect.value;
 
-  // Convert to <img> for iPhone-friendly save
+  if(mode === 'stretch'){
+    // Stretch to fill entire canvas (distorted)
+    ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvasWidth, canvasHeight);
+  } else {
+    // Fit mode: scale to fit, keep aspect
+    const scale = Math.min(canvasWidth / img.width, canvasHeight / img.height);
+    const imgWidth = img.width * scale;
+    const imgHeight = img.height * scale;
+    const dx = (canvasWidth - imgWidth) / 2;
+    const dy = (canvasHeight - imgHeight) / 2;
+    // Optional background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0,0,canvasWidth,canvasHeight);
+    ctx.drawImage(img, 0,0,img.width,img.height, dx, dy, imgWidth, imgHeight);
+  }
+
   const finalImg = new Image();
   finalImg.src = canvas.toDataURL('image/png', 1);
   finalImg.className = 'resized-img';
-  finalImg.alt = 'TikTok 9:16 stretched';
+  finalImg.alt = 'TikTok 9:16 resized';
   container.appendChild(finalImg);
   output.appendChild(container);
 }
