@@ -19,7 +19,6 @@ h1 {
   font-size:18px;
 }
 
-/* TOPBAR */
 .topbar {
   display:flex;
   flex-wrap:wrap;
@@ -54,7 +53,6 @@ button:active {
   color:white;
 }
 
-/* SLIDER */
 .slider-wrap {
   display:flex;
   align-items:center;
@@ -62,7 +60,6 @@ button:active {
   font-size:12px;
 }
 
-/* DROP */
 #drop {
   margin:10px;
   padding:22px;
@@ -71,7 +68,6 @@ button:active {
   text-align:center;
 }
 
-/* GALLERY */
 .gallery {
   max-width:340px;
   margin:auto;
@@ -101,7 +97,6 @@ button:active {
   font-size:11px;
 }
 
-/* ANIMATION */
 @keyframes fadeScale {
   from {opacity:0; transform:scale(0.96) translateY(8px);}
   to {opacity:1; transform:scale(1) translateY(0);}
@@ -126,11 +121,10 @@ button:active {
 
   <div class="slider-wrap">
     <span>Q</span>
-    <input type="range" id="quality" min="0.7" max="1" step="0.01" value="1">
+    <input type="range" id="quality" min="0" max="100" step="1" value="100">
     <span id="qval">100%</span>
   </div>
 
-  <button id="export">Export</button>
   <button id="clear">Clear</button>
 </div>
 
@@ -145,7 +139,6 @@ let fitMode = localStorage.getItem("fitMode") || "blur";
 const stretchBtn = document.getElementById("stretch");
 const fitBtn = document.getElementById("fit");
 const clearBtn = document.getElementById("clear");
-const exportBtn = document.getElementById("export");
 const gallery = document.getElementById("gallery");
 
 const fitSelect = document.getElementById("fitMode");
@@ -162,9 +155,11 @@ function updateUI(){
 }
 updateUI();
 
-/* QUALITY */
+/* QUALITY DISPLAY */
+qval.textContent = qualitySlider.value + "%";
+
 qualitySlider.oninput = ()=>{
-  qval.textContent = Math.round(qualitySlider.value*100) + "%";
+  qval.textContent = qualitySlider.value + "%";
 };
 
 /* BUTTONS */
@@ -186,17 +181,6 @@ fitSelect.onchange = ()=>{
 };
 
 clearBtn.onclick = ()=> gallery.innerHTML="";
-
-/* EXPORT ALL */
-exportBtn.onclick = ()=>{
-  const imgs = document.querySelectorAll(".item img");
-
-  imgs.forEach((img, i)=>{
-    setTimeout(()=>{
-      window.open(img.src, "_blank");
-    }, i * 400);
-  });
-};
 
 /* INPUT */
 document.getElementById("drop").onclick = ()=>{
@@ -225,42 +209,42 @@ function process(img){
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
 
-  const W = 540, H = 960;
-  canvas.width=W;
-  canvas.height=H;
+  const W = 540;
+  const H = 960;
+  canvas.width = W;
+  canvas.height = H;
 
   if(mode==="stretch"){
     ctx.drawImage(img,0,0,W,H);
   } else {
 
     if(fitMode==="blur"){
-      ctx.filter="blur(30px) brightness(0.8)";
+      ctx.filter = "blur(30px) brightness(0.8)";
       ctx.drawImage(img,-50,-50,W+100,H+100);
-      ctx.filter="none";
+      ctx.filter = "none";
     }
     else if(fitMode==="color"){
-      ctx.fillStyle=colorPicker.value;
+      ctx.fillStyle = colorPicker.value;
       ctx.fillRect(0,0,W,H);
     }
     else {
-      ctx.fillStyle="white";
+      ctx.fillStyle = "white";
       ctx.fillRect(0,0,W,H);
     }
 
-    const scale=Math.min(W/img.width,H/img.height);
-    const w=img.width*scale;
-    const h=img.height*scale;
-    const x=(W-w)/2;
-    const y=(H-h)/2;
+    const scale = Math.min(W/img.width, H/img.height);
+    const w = img.width * scale;
+    const h = img.height * scale;
+    const x = (W - w)/2;
+    const y = (H - h)/2;
 
     ctx.drawImage(img,0,0,img.width,img.height,x,y,w,h);
   }
 
-  const url = canvas.toDataURL("image/jpeg", qualitySlider.value);
+  const url = canvas.toDataURL("image/jpeg", qualitySlider.value / 100);
 
   const div = document.createElement("div");
   div.className="item";
-  div.draggable = true;
 
   const image = document.createElement("img");
   image.src = url;
@@ -274,23 +258,6 @@ function process(img){
   div.appendChild(del);
   gallery.appendChild(div);
 }
-
-/* DRAG REORDER */
-let dragged=null;
-
-document.addEventListener("dragstart", e=>{
-  dragged=e.target.closest(".item");
-});
-
-document.addEventListener("dragover", e=>{
-  e.preventDefault();
-  const target=e.target.closest(".item");
-  if(target && target!==dragged){
-    const rect=target.getBoundingClientRect();
-    const next=(e.clientY-rect.top)>rect.height/2;
-    target.parentNode.insertBefore(dragged, next?target.nextSibling:target);
-  }
-});
 </script>
 
 </body>
