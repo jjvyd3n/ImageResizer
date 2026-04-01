@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TikTok 9:16 Resizer</title>
 
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -17,12 +16,7 @@
     min-height: 100vh;
     color: #333;
   }
-  h2 {
-    margin-bottom: 25px;
-    font-weight: 600;
-    color: #fff;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-  }
+  h2 { margin-bottom: 25px; font-weight:600; color:#fff; text-shadow:1px1px4px rgba(0,0,0,0.3);}
   #drop-area {
     border: 2px dashed #fff;
     border-radius: 15px;
@@ -33,47 +27,24 @@
     transition: background 0.3s, transform 0.2s;
     cursor: pointer;
   }
-  #drop-area.dragover {
-    background: rgba(255,255,255,0.35);
-    transform: scale(1.02);
-  }
-  .gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    max-width: 420px;
-    margin: 0 auto;
-  }
-  .canvas-container {
-    position: relative;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-  }
-  canvas {
-    display: block;
-    width: 100%;
-  }
+  #drop-area.dragover { background: rgba(255,255,255,0.35); transform: scale(1.02);}
+  .gallery { display:flex; flex-direction:column; gap:20px; max-width:420px; margin:0 auto;}
+  .canvas-container { position:relative; border-radius:12px; overflow:hidden; box-shadow:0 6px 12px rgba(0,0,0,0.15);}
+  canvas { display:block; width:100%;}
   .download-btn {
-    background: #ff6f61;
-    color: #fff;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 15px;
-    margin-top: 5px;
-    cursor: pointer;
-    width: 100%;
+    background:#ff6f61;
+    color:#fff;
+    border:none;
+    padding:12px;
+    border-radius:8px;
+    font-size:15px;
+    margin-top:5px;
+    cursor:pointer;
+    width:100%;
     transition: background 0.3s, transform 0.2s;
   }
-  .download-btn:hover {
-    background: #e85b50;
-    transform: scale(1.03);
-  }
-  @media (max-width: 500px) {
-    #drop-area { padding: 40px 15px; }
-    .canvas-container { max-width: 95%; }
-  }
+  .download-btn:hover { background:#e85b50; transform:scale(1.03);}
+  @media (max-width:500px){ #drop-area{padding:40px 15px;} .canvas-container{max-width:95%;}}
 </style>
 </head>
 <body>
@@ -85,102 +56,83 @@
 <script>
 const dropArea = document.getElementById('drop-area');
 const output = document.getElementById('output');
-let counter = 1; // For sequential filenames
+let counter = 1;
 
 // Click to open file picker
-dropArea.addEventListener('click', () => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.multiple = true;
-    fileInput.accept = 'image/*';
-    fileInput.onchange = e => handleFiles(e.target.files);
+dropArea.addEventListener('click',()=>{
+    const fileInput=document.createElement('input');
+    fileInput.type='file';
+    fileInput.multiple=true;
+    fileInput.accept='image/*';
+    fileInput.onchange=e=>handleFiles(e.target.files);
     fileInput.click();
 });
 
 // Drag & drop events
-dropArea.addEventListener('dragover', e => {
-    e.preventDefault();
-    dropArea.classList.add('dragover');
-});
-dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
-dropArea.addEventListener('drop', e => {
-    e.preventDefault();
-    dropArea.classList.remove('dragover');
-    handleFiles(e.dataTransfer.files);
-});
+dropArea.addEventListener('dragover',e=>{ e.preventDefault(); dropArea.classList.add('dragover');});
+dropArea.addEventListener('dragleave',()=>dropArea.classList.remove('dragover'));
+dropArea.addEventListener('drop',e=>{ e.preventDefault(); dropArea.classList.remove('dragover'); handleFiles(e.dataTransfer.files);});
 
-function handleFiles(files) {
-    Array.from(files).forEach(file => {
-        if (!file.type.startsWith('image/')) return;
+function handleFiles(files){
+    Array.from(files).forEach(file=>{
+        if(!file.type.startsWith('image/')) return;
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = e=>{
             const img = new Image();
-            img.onload = () => createCanvas(img);
-            img.src = event.target.result;
-        }
+            img.onload = ()=>createCanvas(img);
+            img.src=e.target.result;
+        };
         reader.readAsDataURL(file);
     });
 }
 
-function createCanvas(img) {
-    const container = document.createElement('div');
-    container.className = 'canvas-container';
+function createCanvas(img){
+    const container=document.createElement('div');
+    container.className='canvas-container';
+    const canvas=document.createElement('canvas');
+    const ctx=canvas.getContext('2d');
 
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    // 9:16 crop
+    let targetWidth,targetHeight;
+    const imgRatio=img.width/img.height;
+    const targetRatio=9/16;
 
-    // Calculate 9:16 crop
-    let targetWidth, targetHeight;
-    const imgRatio = img.width / img.height;
-    const targetRatio = 9 / 16;
-
-    if (imgRatio > targetRatio) {
-        targetHeight = img.height;
-        targetWidth = targetHeight * targetRatio;
-    } else {
-        targetWidth = img.width;
-        targetHeight = targetWidth / targetRatio;
+    if(imgRatio>targetRatio){
+        targetHeight=img.height;
+        targetWidth=targetHeight*targetRatio;
+    }else{
+        targetWidth=img.width;
+        targetHeight=targetWidth/targetRatio;
     }
 
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
+    canvas.width=targetWidth;
+    canvas.height=targetHeight;
 
-    const sx = (img.width - targetWidth) / 2;
-    const sy = (img.height - targetHeight) / 2;
+    const sx=(img.width-targetWidth)/2;
+    const sy=(img.height-targetHeight)/2;
 
-    // TikTok-style black bars (5% top/bottom)
-    ctx.fillStyle = 'black';
-    const barHeight = targetHeight * 0.05;
-    ctx.fillRect(0, 0, targetWidth, barHeight);
-    ctx.fillRect(0, targetHeight - barHeight, targetWidth, barHeight);
+    // TikTok black bars
+    ctx.fillStyle='black';
+    const barHeight=targetHeight*0.05;
+    ctx.fillRect(0,0,targetWidth,barHeight);
+    ctx.fillRect(0,targetHeight-barHeight,targetWidth,barHeight);
 
-    // Draw image
-    ctx.drawImage(img, sx, sy, targetWidth, targetHeight, 0, 0, targetWidth, targetHeight);
-
-    // Draw small number for preview
-    ctx.fillStyle = 'white';
-    ctx.font = `${Math.round(targetWidth * 0.08)}px Montserrat`;
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'top';
-    ctx.fillText(counter, targetWidth - 10, 10);
+    ctx.drawImage(img,sx,sy,targetWidth,targetHeight,0,0,targetWidth,targetHeight);
 
     container.appendChild(canvas);
 
-    // Download button with live filename
-    const cleanName = `TikTok_${counter}.png`;
-    const btn = document.createElement('button');
-    btn.textContent = `Download ${cleanName}`;
-    btn.className = 'download-btn';
-    btn.onclick = () => {
-        const link = document.createElement('a');
-        link.download = cleanName;
-        link.href = canvas.toDataURL('image/png', 1);
-        link.click();
+    // Button opens image in new tab for iPhone
+    const cleanName=`TikTok_${counter}.png`;
+    const btn=document.createElement('button');
+    btn.textContent=`Save ${cleanName}`;
+    btn.className='download-btn';
+    btn.onclick=()=>{
+        const imgURL=canvas.toDataURL('image/png',1);
+        window.open(imgURL,'_blank');
     };
 
     container.appendChild(btn);
     output.appendChild(container);
-
     counter++;
 }
 </script>
