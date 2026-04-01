@@ -11,7 +11,6 @@ body {
   background: linear-gradient(135deg, #ff9a9e, #fad0c4);
   text-align: center;
   padding: 20px;
-  min-height: 100vh;
   color: #333;
 }
 h2 { margin-bottom: 25px; font-weight:600; color:#fff; text-shadow:1px1px4px rgba(0,0,0,0.3);}
@@ -22,13 +21,11 @@ h2 { margin-bottom: 25px; font-weight:600; color:#fff; text-shadow:1px1px4px rgb
   padding: 50px 20px;
   margin-bottom: 25px;
   box-shadow: 0 8px 15px rgba(0,0,0,0.2);
-  transition: background 0.3s, transform 0.2s;
   cursor: pointer;
 }
 #drop-area.dragover { background: rgba(255,255,255,0.35); transform: scale(1.02);}
 .gallery { display:flex; flex-direction:column; gap:20px; max-width:420px; margin:0 auto;}
-.canvas-container { position:relative; border-radius:12px; overflow:hidden; box-shadow:0 6px 12px rgba(0,0,0,0.15);}
-canvas { display:none; }
+.canvas-container { border-radius:12px; overflow:hidden; box-shadow:0 6px 12px rgba(0,0,0,0.15);}
 .resized-img { width:100%; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.15);}
 @media (max-width:500px){ #drop-area{padding:40px 15px;} .canvas-container{max-width:95%;}}
 </style>
@@ -60,55 +57,51 @@ function handleFiles(files){
     const reader = new FileReader();
     reader.onload = e=>{
       const img = new Image();
-      img.onload = ()=>createCanvas(img);
+      img.onload = ()=>processImage(img);
       img.src=e.target.result;
     };
     reader.readAsDataURL(file);
   });
 }
 
-function createCanvas(img){
-  const container=document.createElement('div');
+function processImage(img){
+  const container = document.createElement('div');
   container.className='canvas-container';
+  
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
 
-  const canvas=document.createElement('canvas');
-  const ctx=canvas.getContext('2d');
-
-  // 9:16 crop
-  let targetWidth,targetHeight;
-  const imgRatio=img.width/img.height;
-  const targetRatio=9/16;
-
-  if(imgRatio>targetRatio){
-    targetHeight=img.height;
-    targetWidth=targetHeight*targetRatio;
+  // Determine 9:16 crop
+  const targetRatio = 9/16;
+  let targetWidth, targetHeight;
+  if(img.width/img.height > targetRatio){
+    targetHeight = img.height;
+    targetWidth = targetHeight * targetRatio;
   }else{
-    targetWidth=img.width;
-    targetHeight=targetWidth/targetRatio;
+    targetWidth = img.width;
+    targetHeight = targetWidth / targetRatio;
   }
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
 
-  canvas.width=targetWidth;
-  canvas.height=targetHeight;
+  const sx = (img.width - targetWidth)/2;
+  const sy = (img.height - targetHeight)/2;
 
-  const sx=(img.width-targetWidth)/2;
-  const sy=(img.height-targetHeight)/2;
-
-  // Draw the main image
+  // Draw image
   ctx.drawImage(img,sx,sy,targetWidth,targetHeight,0,0,targetWidth,targetHeight);
 
-  // TikTok-style black bars (5% top and bottom)
-  const barHeight = targetHeight * 0.05;
+  // Draw black bars (5% top/bottom)
+  const barH = targetHeight * 0.05;
   ctx.fillStyle = 'black';
-  ctx.fillRect(0,0,targetWidth,barHeight); // top
-  ctx.fillRect(0,targetHeight-barHeight,targetWidth,barHeight); // bottom
+  ctx.fillRect(0,0,targetWidth,barH); // top
+  ctx.fillRect(0,targetHeight-barH,targetWidth,barH); // bottom
 
-  // Convert canvas to iPhone-friendly <img>
+  // Convert to <img> for iPhone-friendly save
   const finalImg = new Image();
   finalImg.src = canvas.toDataURL('image/png',1);
   finalImg.className='resized-img';
   finalImg.alt='TikTok 9:16 resized';
   container.appendChild(finalImg);
-
   output.appendChild(container);
 }
 </script>
