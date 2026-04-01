@@ -9,9 +9,12 @@
 body {
   font-family: 'Montserrat', sans-serif;
   background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+  background-size: cover;
   text-align: center;
   padding: 20px;
   color: #333;
+  min-height: 100vh;
+  margin: 0;
 }
 h2 { margin-bottom: 10px; font-weight:600; color:#fff; text-shadow:1px1px4px rgba(0,0,0,0.3);}
 #drop-area { border:2px dashed #fff; border-radius:15px; background: rgba(255,255,255,0.2); padding:50px 20px; margin-bottom:15px; box-shadow:0 8px 15px rgba(0,0,0,0.2); cursor:pointer;}
@@ -20,8 +23,9 @@ h2 { margin-bottom: 10px; font-weight:600; color:#fff; text-shadow:1px1px4px rgb
 .toggle-container button { margin:0 5px; padding:8px 16px; border:none; border-radius:8px; font-weight:600; cursor:pointer; background: rgba(255,255,255,0.7); color:#333; transition:0.2s;}
 .toggle-container button.active { background: rgba(0,0,0,0.8); color:#fff;}
 .gallery { display:flex; flex-direction:column; gap:20px; max-width:420px; margin:0 auto;}
-.canvas-container { border-radius:12px; overflow:hidden; box-shadow:0 6px 12px rgba(0,0,0,0.15);}
+.canvas-container { position:relative; border-radius:12px; overflow:hidden; box-shadow:0 6px 12px rgba(0,0,0,0.15);}
 .resized-img { width:100%; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.15);}
+.delete-btn { position:absolute; top:8px; right:8px; padding:5px 10px; background: rgba(255,0,0,0.8); color:#fff; border:none; border-radius:5px; font-size:12px; cursor:pointer;}
 @media (max-width:500px){ #drop-area{padding:40px 15px;} .canvas-container{max-width:95%;}}
 </style>
 </head>
@@ -74,6 +78,7 @@ function handleFiles(files){
 function processImage(img){
   const container = document.createElement('div');
   container.className='canvas-container';
+  
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
@@ -83,15 +88,12 @@ function processImage(img){
   canvas.height = canvasHeight;
 
   if(currentMode==='stretch'){
-    // Stretch to fill entire canvas
     ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvasWidth, canvasHeight);
   } else {
-    // Fit with blurred background
-    // Draw blurred background
+    // Fit mode with blurred background
     ctx.filter = 'blur(25px)';
     ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvasWidth, canvasHeight);
     ctx.filter = 'none';
-    // Draw centered image with correct aspect ratio
     const scale = Math.min(canvasWidth / img.width, canvasHeight / img.height);
     const imgWidth = img.width * scale;
     const imgHeight = img.height * scale;
@@ -104,7 +106,15 @@ function processImage(img){
   finalImg.src = canvas.toDataURL('image/png',1);
   finalImg.className='resized-img';
   finalImg.alt='TikTok 9:16 resized';
+
+  // Delete button
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className='delete-btn';
+  deleteBtn.innerText='Delete';
+  deleteBtn.onclick = () => container.remove();
+
   container.appendChild(finalImg);
+  container.appendChild(deleteBtn);
   output.appendChild(container);
 }
 </script>
