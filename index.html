@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TikTok 9:16 Resizer (Fit)</title>
+<title>TikTok 9:16 Stretch Resizer</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 <style>
 body {
@@ -23,7 +23,7 @@ h2 { margin-bottom: 25px; font-weight:600; color:#fff; text-shadow:1px1px4px rgb
 </style>
 </head>
 <body>
-<h2>TikTok 9:16 Resizer (Fit)</h2>
+<h2>TikTok 9:16 Stretch Resizer</h2>
 <div id="drop-area">Tap or Drop Images Here</div>
 <div class="gallery" id="output"></div>
 <script>
@@ -64,29 +64,19 @@ function processImage(img){
   const ctx = canvas.getContext('2d');
 
   // TikTok 9:16 canvas
-  const canvasWidth = 540; // you can adjust pixel size
-  const canvasHeight = 960;
+  const canvasWidth = 540;  // width in px
+  const canvasHeight = 960; // height in px
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
-  // Fit image inside canvas
-  const scale = Math.min(canvasWidth/img.width, canvasHeight/img.height);
-  const imgWidth = img.width * scale;
-  const imgHeight = img.height * scale;
-  const dx = (canvasWidth - imgWidth)/2;
-  const dy = (canvasHeight - imgHeight)/2;
+  // Stretch image to fill entire canvas
+  ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvasWidth, canvasHeight);
 
-  // Optional background (white)
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0,0,canvasWidth,canvasHeight);
-
-  ctx.drawImage(img, 0,0,img.width,img.height, dx, dy, imgWidth, imgHeight);
-
-  // Convert to <img> for iPhone-friendly saving
+  // Convert to <img> for iPhone-friendly save
   const finalImg = new Image();
   finalImg.src = canvas.toDataURL('image/png', 1);
   finalImg.className = 'resized-img';
-  finalImg.alt = 'TikTok 9:16 resized';
+  finalImg.alt = 'TikTok 9:16 stretched';
   container.appendChild(finalImg);
   output.appendChild(container);
 }
