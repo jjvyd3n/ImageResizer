@@ -3,186 +3,361 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Resizer Pro (9:16 Format)</title>
+<title>Image Toolkit Pro</title>
 <style>
-/* BODY & GRADIENT ANIMATION */
+/* --- General Styles --- */
 body {
-  margin:0;
-  font-family: system-ui;
-  color:white;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fbc2eb);
-  background-size: 600% 600%;
-  animation: gradientAnim 15s ease infinite;
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: linear-gradient(-45deg, #667eea, #764ba2, #ff758c, #ff7eb3);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  color: #fff;
 }
 
-@keyframes gradientAnim {
-  0%{background-position:0% 50%}
-  50%{background-position:100% 50%}
-  100%{background-position:0% 50%}
+@keyframes gradientBG {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
 }
 
-/* HEADER */
-h1 {
+header {
   text-align:center;
-  padding:14px;
-  font-size:18px;
+  padding: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
-/* TOPBAR */
-.topbar {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:8px;
-  padding:10px;
+.tabs {
+  display: flex;
+  overflow-x: auto;
+  border-bottom: 2px solid rgba(255,255,255,0.3);
 }
 
-button, input {
-  padding:7px 10px;
-  border-radius:8px;
-  border:none;
-  font-weight:600;
+.tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
+.tab.active {
+  border-bottom: 3px solid #fff;
+  font-weight: bold;
+}
+
+.section {
+  display: none;
+  padding: 15px;
+}
+
+.section.active {
+  display: block;
+}
+
+/* --- Buttons --- */
 button {
-  cursor:pointer;
-  transition: transform 0.15s;
+  padding: 10px 15px;
+  margin: 5px 0;
+  border: none;
+  background: #fff;
+  color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
-button:active { transform: scale(0.92); }
-
-#clear { background:red; color:white; }
-
-.slider-wrap {
-  display:flex;
-  align-items:center;
-  gap:5px;
-  font-size:12px;
+button.red {
+  background: #ff4c4c;
+  color: #fff;
 }
 
-/* DROP ZONE */
-#drop {
-  margin:10px;
-  padding:22px;
-  border:2px dashed white;
-  border-radius:10px;
-  text-align:center;
+/* --- Inputs / Sliders --- */
+input[type="range"], input[type="text"] {
+  width: 100%;
+  margin: 10px 0;
+  border-radius: 6px;
+  padding: 5px;
+  font-size: 1rem;
 }
 
-/* GALLERY */
-.gallery {
-  max-width:340px;
-  margin:auto;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  padding-bottom:40px;
+/* --- Canvas/Image Previews --- */
+img, canvas {
+  max-width: 100%;
+  margin: 10px 0;
+  border-radius: 10px;
+  display: block;
+}
+.preview-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
 
-.item {
-  position:relative;
-  border-radius:10px;
-  overflow:hidden;
-  animation: fadeScale 0.35s ease;
+/* --- Grid Layout --- */
+.grid-item {
+  width: 30%;
+  aspect-ratio: 9/16;
+  object-fit: cover;
+  border-radius: 6px;
 }
 
-.item img { width:100%; }
-
-.delete {
-  position:absolute;
-  top:5px;
-  right:5px;
-  background:red;
-  color:white;
-  font-size:11px;
+/* --- Small Sections --- */
+.section h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  text-align: center;
 }
 
-/* ANIMATION */
-@keyframes fadeScale {
-  from {opacity:0; transform:scale(0.96) translateY(8px);}
-  to {opacity:1; transform:scale(1) translateY(0);}
+/* --- Responsive --- */
+@media (max-width: 600px){
+  .grid-item { width: 45%; }
 }
 </style>
 </head>
 <body>
 
-<h1>Image Resizer Pro (9:16 Format)</h1>
+<header>Image Toolkit Pro (9:16 Format)</header>
 
-<div class="topbar">
-  <div class="slider-wrap">
-    <span>Resolution</span>
-    <input type="range" id="quality" min="10" max="100" step="1" value="100">
-    <span id="qval">100%</span>
-  </div>
-  <button id="clear">Clear</button>
+<div class="tabs">
+  <div class="tab active" data-tab="resizer">Resizer</div>
+  <div class="tab" data-tab="text">Text</div>
+  <div class="tab" data-tab="gif">GIF Maker</div>
+  <div class="tab" data-tab="crop">Cinematic Crop</div>
+  <div class="tab" data-tab="grid">Grid Preview</div>
+  <div class="tab" data-tab="blur">Blur / Depth</div>
 </div>
 
-<div id="drop">Tap or Drop Images</div>
-<div class="gallery" id="gallery"></div>
+<!-- ---------------- IMAGE RESIZER ---------------- -->
+<div class="section active" id="resizer">
+  <h2>9:16 Image Resizer</h2>
+  <input type="file" id="resizeInput" multiple>
+  <canvas id="resizeCanvas"></canvas>
+  <button id="saveResize">Save Image</button>
+</div>
 
+<!-- ---------------- TEXT GENERATOR ---------------- -->
+<div class="section" id="text">
+  <h2>Upside-down / Reverse Text</h2>
+  <input type="text" id="textInput" placeholder="Type here...">
+  <div>
+    <label><input type="checkbox" id="reverseText"> Reverse</label>
+    <label><input type="checkbox" id="flipText"> Upside-down</label>
+  </div>
+  <textarea id="textOutput" rows="4" readonly></textarea>
+  <button id="copyText">Copy</button>
+</div>
+
+<!-- ---------------- GIF MAKER ---------------- -->
+<div class="section" id="gif">
+  <h2>GIF Maker</h2>
+  <input type="file" id="gifInput" multiple>
+  <label>Frame Delay (ms): <input type="number" id="gifSpeed" value="500"></label>
+  <button id="generateGif">Generate GIF</button>
+  <canvas id="gifPreview"></canvas>
+  <a id="downloadGif" download="animated.gif">Download GIF</a>
+</div>
+
+<!-- ---------------- CINEMATIC CROP ---------------- -->
+<div class="section" id="crop">
+  <h2>Cinematic Crop</h2>
+  <input type="file" id="cropInput">
+  <canvas id="cropCanvas"></canvas>
+  <button id="saveCrop">Save Cropped</button>
+  <label>Ratio: 
+    <select id="cropRatio">
+      <option value="2.35">2.35:1</option>
+      <option value="1.85">1.85:1</option>
+    </select>
+  </label>
+</div>
+
+<!-- ---------------- GRID PREVIEW ---------------- -->
+<div class="section" id="grid">
+  <h2>Image Layout / Grid Preview</h2>
+  <input type="file" id="gridInput" multiple>
+  <div class="preview-container" id="gridPreview"></div>
+</div>
+
+<!-- ---------------- BLUR / DEPTH ---------------- -->
+<div class="section" id="blur">
+  <h2>Motion Blur + Depth Focus</h2>
+  <input type="file" id="blurInput">
+  <label>Blur: <input type="range" id="blurSlider" min="0" max="20" value="5"></label>
+  <label>Focus Radius: <input type="range" id="focusSlider" min="0" max="300" value="100"></label>
+  <canvas id="blurCanvas"></canvas>
+  <button id="saveBlur">Save Image</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 <script>
-const qualitySlider = document.getElementById("quality");
-const qval = document.getElementById("qval");
-const gallery = document.getElementById("gallery");
-const clearBtn = document.getElementById("clear");
-
-qval.textContent = qualitySlider.value + "%";
-qualitySlider.oninput = ()=> { qval.textContent = qualitySlider.value + "%"; };
-
-clearBtn.onclick = ()=> gallery.innerHTML="";
-
-/* IMAGE INPUT */
-document.getElementById("drop").onclick = ()=>{
-  const input = document.createElement("input");
-  input.type="file";
-  input.multiple=true;
-  input.accept="image/*";
-  input.onchange = e => handleFiles(e.target.files);
-  input.click();
-};
-
-function handleFiles(files){
-  [...files].forEach(file=>{
-    const reader = new FileReader();
-    reader.onload = e=>{
-      const img = new Image();
-      img.onload = ()=>process(img);
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+/* ---------- TAB SWITCHING ---------- */
+const tabs = document.querySelectorAll('.tab');
+const sections = document.querySelectorAll('.section');
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    sections.forEach(sec => sec.classList.remove('active'));
+    document.getElementById(tab.dataset.tab).classList.add('active');
   });
+});
+
+/* ---------- IMAGE RESIZER ---------- */
+const resizeInput = document.getElementById('resizeInput');
+const resizeCanvas = document.getElementById('resizeCanvas');
+const resizeCtx = resizeCanvas.getContext('2d');
+let resizeImage = new Image();
+
+resizeInput.addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const url = URL.createObjectURL(file);
+  resizeImage.onload = ()=>{
+    resizeCanvas.width = 1080;
+    resizeCanvas.height = 1920;
+    resizeCtx.drawImage(resizeImage, 0,0,1080,1920);
+  }
+  resizeImage.src = url;
+});
+document.getElementById('saveResize').addEventListener('click', ()=>{
+  const link = document.createElement('a');
+  link.href = resizeCanvas.toDataURL('image/png');
+  link.download = 'resized.png';
+  link.click();
+});
+
+/* ---------- TEXT GENERATOR ---------- */
+const textInput = document.getElementById('textInput');
+const textOutput = document.getElementById('textOutput');
+const reverseCheck = document.getElementById('reverseText');
+const flipCheck = document.getElementById('flipText');
+
+const flipMap = {'a':'ɐ','b':'q','c':'ɔ','d':'p','e':'ǝ','f':'ɟ','g':'ƃ','h':'ɥ','i':'ᴉ','j':'ɾ','k':'ʞ','l':'ʃ','m':'ɯ','n':'u','o':'o','p':'d','q':'b','r':'ɹ','s':'s','t':'ʇ','u':'n','v':'ʌ','w':'ʍ','x':'x','y':'ʎ','z':'z',
+'A':'∀','B':'𐐒','C':'Ɔ','D':'p','E':'Ǝ','F':'Ⅎ','G':'פ','H':'H','I':'I','J':'ſ','K':'K','L':'˥','M':'W','N':'N','O':'O','P':'Ԁ','Q':'Q','R':'ɹ','S':'S','T':'⊥','U':'∩','V':'Λ','W':'M','X':'X','Y':'⅄','Z':'Z'};
+function flipTextFunc(str){
+  return str.split('').map(c=>flipMap[c]||c).reverse().join('');
+}
+function updateText(){
+  let val = textInput.value;
+  if(reverseCheck.checked) val = val.split('').reverse().join('');
+  if(flipCheck.checked) val = flipTextFunc(val);
+  textOutput.value = val;
+}
+textInput.addEventListener('input', updateText);
+reverseCheck.addEventListener('change', updateText);
+flipCheck.addEventListener('change', updateText);
+document.getElementById('copyText').addEventListener('click', ()=>{
+  textOutput.select();
+  navigator.clipboard.writeText(textOutput.value);
+});
+
+/* ---------- GIF MAKER ---------- */
+const gifInput = document.getElementById('gifInput');
+const gifPreview = document.getElementById('gifPreview');
+const downloadGif = document.getElementById('downloadGif');
+document.getElementById('generateGif').addEventListener('click', ()=>{
+  const files = gifInput.files;
+  if(!files.length) return;
+  const gif = new GIF({workers:2, quality:10});
+  Array.from(files).forEach(file=>{
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = ()=>{
+      gif.addFrame(img,{delay:parseInt(document.getElementById('gifSpeed').value)});
+      if(gif.frames.length===files.length){
+        gif.on('finished', blob=>{
+          const url = URL.createObjectURL(blob);
+          downloadGif.href = url;
+        });
+        gif.render();
+      }
+    };
+    img.src = url;
+  });
+});
+
+/* ---------- CINEMATIC CROP ---------- */
+const cropInput = document.getElementById('cropInput');
+const cropCanvas = document.getElementById('cropCanvas');
+const cropCtx = cropCanvas.getContext('2d');
+cropInput.addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const img = new Image();
+  img.onload = ()=>{
+    const ratio = parseFloat(document.getElementById('cropRatio').value);
+    cropCanvas.width = 1080;
+    cropCanvas.height = 1080/ratio;
+    cropCtx.drawImage(img,0,0,cropCanvas.width,cropCanvas.height);
+  };
+  img.src = URL.createObjectURL(file);
+});
+document.getElementById('saveCrop').addEventListener('click', ()=>{
+  const link = document.createElement('a');
+  link.href = cropCanvas.toDataURL('image/png');
+  link.download = 'cropped.png';
+  link.click();
+});
+
+/* ---------- GRID PREVIEW ---------- */
+const gridInput = document.getElementById('gridInput');
+const gridPreview = document.getElementById('gridPreview');
+gridInput.addEventListener('change', e=>{
+  gridPreview.innerHTML='';
+  Array.from(e.target.files).forEach(file=>{
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.className='grid-item';
+    gridPreview.appendChild(img);
+  });
+});
+
+/* ---------- BLUR / DEPTH FOCUS ---------- */
+const blurInput = document.getElementById('blurInput');
+const blurCanvas = document.getElementById('blurCanvas');
+const blurCtx = blurCanvas.getContext('2d');
+let blurImg = new Image();
+
+blurInput.addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  blurImg.onload = drawBlurDepth;
+  blurImg.src = URL.createObjectURL(file);
+});
+
+function drawBlurDepth(){
+  blurCanvas.width = 1080;
+  blurCanvas.height = 1920;
+  const blurAmount = parseInt(document.getElementById('blurSlider').value);
+  const focusRadius = parseInt(document.getElementById('focusSlider').value);
+  
+  // draw original image first
+  blurCtx.filter = `blur(${blurAmount}px)`;
+  blurCtx.drawImage(blurImg,0,0,1080,1920);
+  
+  // draw focus circle (clear the center)
+  const cx = 1080/2;
+  const cy = 1920/2;
+  blurCtx.save();
+  blurCtx.beginPath();
+  blurCtx.arc(cx, cy, focusRadius, 0, Math.PI*2);
+  blurCtx.clip();
+  blurCtx.filter = 'none';
+  blurCtx.drawImage(blurImg,0,0,1080,1920);
+  blurCtx.restore();
 }
 
-/* PROCESS IMAGE - STRETCH MODE ONLY */
-function process(img){
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-
-  const baseW = 540, baseH = 960;
-  const scale = qualitySlider.value / 100;
-  canvas.width = baseW * scale;
-  canvas.height = baseH * scale;
-
-  ctx.drawImage(img,0,0,canvas.width,canvas.height);
-
-  const url = canvas.toDataURL("image/jpeg", 1);
-
-  const div = document.createElement("div");
-  div.className="item";
-
-  const image = document.createElement("img");
-  image.src = url;
-
-  const del = document.createElement("button");
-  del.textContent="X";
-  del.className="delete";
-  del.onclick = ()=>div.remove();
-
-  div.appendChild(image);
-  div.appendChild(del);
-  gallery.appendChild(div);
-}
+document.getElementById('blurSlider').addEventListener('input', drawBlurDepth);
+document.getElementById('focusSlider').addEventListener('input', drawBlurDepth);
+document.getElementById('saveBlur').addEventListener('click', ()=>{
+  const link = document.createElement('a');
+  link.href = blurCanvas.toDataURL('image/png');
+  link.download = 'blurred.png';
+  link.click();
+});
 </script>
 </body>
 </html>
