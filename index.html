@@ -3,45 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Image Toolkit Pro (9:16 Format)</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-html, body {
-  margin:0;
-  padding:0;
-  height:100%;
+html, body {margin:0; padding:0; height:100%;}
+
+/* FULLSCREEN GRADIENT */
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  background: linear-gradient(-45deg, #667eea, #764ba2, #ff758c, #ff7eb3);
+  background-size:400% 400%;
+  animation:gradientBG 15s ease infinite;
 }
 
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family:'Inter', system-ui, sans-serif;
   color:white;
-  min-height:100vh;
-  background: linear-gradient(-45deg, #667eea, #764ba2, #ff758c, #ff7eb3);
-  background-size: 400% 400%;
-  animation: gradientBG 15s ease infinite;
+  overflow-x:hidden;
 }
 
 @keyframes gradientBG {
-  0% {background-position:0% 50%;}
-  50% {background-position:100% 50%;}
-  100% {background-position:0% 50%;}
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
 
+/* TITLE */
 h1 {
   text-align:center;
-  font-size:20px;
-  font-weight:600;
-  padding:18px 10px 10px;
+  font-size:28px;
+  font-weight:700;
+  letter-spacing:-0.5px;
+  padding:20px 10px 10px;
 }
 
+/* NAV WITH SLIDING UNDERLINE */
 .nav {
   display:flex;
   justify-content:center;
   gap:8px;
-  padding:10px;
+  position:relative;
+  padding:10px 0 20px;
 }
 
 .nav button {
@@ -51,182 +56,122 @@ h1 {
   border:none;
   padding:6px 10px;
   border-radius:10px;
-  font-weight:500;
+  position:relative;
+  z-index:1;
+  transition: transform 0.2s;
 }
 
 .nav button.active {
-  background:white;
   color:black;
 }
 
-.section {
-  display:none;
-  padding:12px;
-  animation: fadeIn 0.4s ease;
-}
-
-.section.active { display:block; }
-
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(10px)}
-  to {opacity:1;}
-}
-
-button {
-  border:none;
-  border-radius:10px;
-  padding:7px 10px;
-  font-weight:500;
-}
-
-button:active { transform:scale(0.95); }
-
-.red {
-  background:#ff4d4d;
-  color:white;
-}
-
-.gallery {
-  max-width:360px;
-  margin:15px auto;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.item {
-  position:relative;
-  border-radius:12px;
-  overflow:hidden;
-  animation: smoothIn 0.4s ease;
-}
-
-@keyframes smoothIn {
-  from {opacity:0; transform:scale(0.96)}
-  to {opacity:1;}
-}
-
-.item img { width:100%; }
-
-.delete {
+.nav::after {
+  content:"";
   position:absolute;
-  top:6px;
-  right:6px;
-  background:#ff4d4d;
-  color:white;
-  font-size:12px;
+  bottom:0;
+  left:0;
+  height:3px;
+  width:0;
+  background:white;
+  border-radius:2px;
+  transition:0.3s all ease;
 }
 
-.drop {
-  margin:15px auto;
-  max-width:360px;
-  padding:22px;
-  border:2px dashed rgba(255,255,255,0.5);
-  border-radius:12px;
-  text-align:center;
-}
+/* SECTION */
+.section { display:none; padding:12px; }
+.section.active { display:block; transition: opacity 0.4s ease-in-out; }
+button { border:none; border-radius:10px; padding:7px 10px; cursor:pointer; }
+button:active { transform:scale(0.95); }
+.red { background:#ff4d4d; color:white; }
 
-.control {
-  max-width:300px;
-  margin:10px auto;
-  text-align:center;
-  font-size:14px;
-}
+/* RESIZER */
+.gallery { max-width:360px; margin:15px auto; display:flex; flex-direction:column; gap:14px; }
+.item { position:relative; border-radius:12px; overflow:hidden; }
+.item img { width:100%; }
+.delete { position:absolute; top:6px; right:6px; background:#ff4d4d; color:white; font-size:12px; }
+.drop { margin:15px auto; max-width:360px; padding:22px; border:2px dashed rgba(255,255,255,0.5); border-radius:12px; text-align:center; cursor:pointer; }
+.control { max-width:300px; margin:10px auto; text-align:center; font-size:14px; }
+input[type="range"] { width:90%; }
 
-input[type="range"] {
-  width:90%;
-  margin-top:6px;
-}
+/* TEXT TOOL */
+.box { max-width:360px; margin:auto; display:flex; flex-direction:column; gap:10px; }
+textarea, input { border:none; border-radius:10px; padding:10px; font-size:14px; }
 
-.box {
-  max-width:360px;
-  margin:auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-textarea, input {
-  border:none;
-  border-radius:10px;
-  padding:10px;
-  font-size:14px;
-}
-
-img {
-  width:100%;
-  border-radius:12px;
-  margin-top:10px;
-}
+/* GIF */
+.gif-list { max-width:360px; margin:10px auto; display:flex; flex-direction:column; gap:10px; }
+.gif-item { position:relative; border-radius:12px; overflow:hidden; cursor:grab; }
+.gif-item img { width:100%; }
 </style>
 </head>
-
 <body>
 
 <h1>Image Toolkit Pro (9:16 Format)</h1>
 
-<div class="nav">
+<div class="nav" id="nav">
   <button class="active" onclick="show('resizer',this)">Resizer</button>
   <button onclick="show('text',this)">Text</button>
   <button onclick="show('gif',this)">GIF</button>
+  <div class="underline" id="underline"></div>
 </div>
 
 <!-- RESIZER -->
 <div id="resizer" class="section active">
-
-<div class="control">
-Resolution
-<input type="range" id="quality" min="10" max="100" value="100">
-<span id="qval">100%</span>
+  <div class="control">
+    Resolution
+    <input type="range" id="quality" min="10" max="100" value="100">
+    <span id="qval">100%</span>
+  </div>
+  <div class="control"><button id="clear" class="red">Clear All</button></div>
+  <div class="drop" onclick="pick()">Tap or Drop Images</div>
+  <div class="gallery" id="gallery"></div>
 </div>
 
-<div class="control">
-<button id="clear" class="red">Clear All</button>
-</div>
-
-<div class="drop" onclick="pick()">Tap or Drop Images</div>
-<div class="gallery" id="gallery"></div>
-
-</div>
-
-<!-- TEXT -->
+<!-- TEXT TOOL -->
 <div id="text" class="section">
-<div class="box">
-
-<input id="input" placeholder="Type here...">
-
-<label><input type="checkbox" id="rev"> Reverse</label>
-<label><input type="checkbox" id="flip"> Upside Down</label>
-
-<textarea id="out" rows="4"></textarea>
-
-<button onclick="copy()">Copy</button>
-
-</div>
+  <div class="box">
+    <input id="input" placeholder="Type here...">
+    <label><input type="checkbox" id="rev"> Reverse (readable)</label>
+    <label><input type="checkbox" id="flip"> Upside Down</label>
+    <textarea id="out" rows="4"></textarea>
+    <button onclick="copy()">Copy</button>
+  </div>
 </div>
 
-<!-- GIF -->
+<!-- GIF TOOL -->
 <div id="gif" class="section">
-
-<div class="drop" onclick="pickGif()">Tap or Drop Images</div>
-
-<div class="control">
-Speed: <span id="speedVal">0.40s</span>
-<input type="range" id="speed" min="50" max="1000" value="400">
-</div>
-
-<img id="gifPreview">
-
+  <div class="drop" onclick="pickGif()">Tap or Drop Images</div>
+  <div class="gif-list" id="gifList"></div>
+  <div class="control"><button class="red" onclick="clearGif()">Clear All</button></div>
+  <div class="control">Speed: <span id="speedVal">5</span>
+    <input type="range" id="speed" min="1" max="10" value="5">
+  </div>
+  <img id="gifPreview">
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
 
 <script>
+/* NAV WITH SLIDING UNDERLINE */
+const nav=document.getElementById("nav");
+const underline=document.createElement("div");
+underline.style.position="absolute";
+underline.style.height="3px";
+underline.style.background="white";
+underline.style.bottom="0";
+underline.style.transition="0.3s all ease";
+nav.appendChild(underline);
+
 function show(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+
+  // move underline
+  const rect=btn.getBoundingClientRect();
+  const navRect=nav.getBoundingClientRect();
+  underline.style.width=rect.width+"px";
+  underline.style.left=(rect.left-navRect.left)+"px";
 }
 
 /* RESIZER */
@@ -257,11 +202,9 @@ function handle(files){
 function process(img){
   const c=document.createElement("canvas");
   const ctx=c.getContext("2d");
-
   const scale=q.value/100;
   c.width=540*scale;
   c.height=960*scale;
-
   ctx.drawImage(img,0,0,c.width,c.height);
 
   const url=c.toDataURL("image/jpeg",1);
@@ -281,62 +224,94 @@ function process(img){
   div.appendChild(del);
   gallery.appendChild(div);
 }
-
 document.getElementById("clear").onclick=()=>gallery.innerHTML="";
 
-/* TEXT */
-const map={'a':'ɐ','b':'q','c':'ɔ','d':'p','e':'ǝ'};
+/* TEXT TOOL */
+const input=document.getElementById("input");
+const flip=document.getElementById("flip");
+const rev=document.getElementById("rev");
+const out=document.getElementById("out");
+
 function update(){
   let v=input.value;
-  if(rev.checked) v=v.split('').reverse().join('');
-  if(flip.checked) v=v.split('').map(c=>map[c]||c).reverse().join('');
+  if(flip.checked) v=v.split('').reverse().join('');
   out.value=v;
 }
 input.oninput=update;
 rev.onchange=update;
 flip.onchange=update;
+function copy(){navigator.clipboard.writeText(out.value);}
 
-function copy(){
-  navigator.clipboard.writeText(out.value);
-}
-
-/* GIF */
+/* GIF TOOL */
 let gifImgs=[];
+const gifList=document.getElementById("gifList");
+const gifPreview=document.getElementById("gifPreview");
+const speed=document.getElementById("speed");
+const speedVal=document.getElementById("speedVal");
+
 function pickGif(){
   const i=document.createElement("input");
   i.type="file"; i.multiple=true; i.accept="image/*";
   i.onchange=e=>{
-    gifImgs=[...e.target.files];
+    gifImgs=[...gifImgs,...e.target.files];
+    renderList();
     generateGif();
   };
   i.click();
 }
 
+/* DRAG TO REORDER */
+function renderList(){
+  gifList.innerHTML="";
+  gifImgs.forEach((file,index)=>{
+    const div=document.createElement("div");
+    div.className="gif-item";
+    div.draggable=true;
+
+    const img=document.createElement("img");
+    img.src=URL.createObjectURL(file);
+
+    const del=document.createElement("button");
+    del.textContent="X";
+    del.className="delete";
+    del.onclick=()=>{
+      gifImgs.splice(index,1);
+      renderList();
+      generateGif();
+    };
+
+    div.ondragstart=e=>{ e.dataTransfer.setData("index",index); };
+    div.ondragover=e=>e.preventDefault();
+    div.ondrop=e=>{
+      const from=e.dataTransfer.getData("index");
+      const temp=gifImgs[from];
+      gifImgs.splice(from,1);
+      gifImgs.splice(index,0,temp);
+      renderList();
+      generateGif();
+    };
+
+    div.appendChild(img);
+    div.appendChild(del);
+    gifList.appendChild(div);
+  });
+}
+
+function clearGif(){ gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; }
+
 function generateGif(){
   if(!gifImgs.length) return;
-
-  const gif = new GIF({
-    workers:2,
-    quality:1,
-    width:540,
-    height:960
-  });
-
+  const gif=new GIF({workers:2,quality:1,width:540,height:960});
   let loaded=0;
-
   gifImgs.forEach(file=>{
     const img=new Image();
     img.src=URL.createObjectURL(file);
-
     img.onload=()=>{
-      gif.addFrame(img,{delay:speed.value});
+      const delay=1000/(speed.value);
+      gif.addFrame(img,{delay});
       loaded++;
-
       if(loaded===gifImgs.length){
-        gif.on('finished', blob=>{
-          const url=URL.createObjectURL(blob);
-          document.getElementById("gifPreview").src=url;
-        });
+        gif.on('finished',blob=>{gifPreview.src=URL.createObjectURL(blob);});
         gif.render();
       }
     };
@@ -344,7 +319,8 @@ function generateGif(){
 }
 
 speed.oninput=()=>{
-  speedVal.textContent=(speed.value/1000).toFixed(2)+"s";
+  speedVal.textContent=speed.value;
+  generateGif();
 };
 </script>
 
