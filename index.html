@@ -3,121 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Image Toolkit Pro (9:16 Format)</title>
 
 <style>
+/* FONT + BASE */
 body {
   margin:0;
-  font-family: system-ui;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color:white;
   min-height:100vh;
+
   background: linear-gradient(135deg,#ff9a9e,#fad0c4,#fbc2eb);
   background-size: 400% 400%;
-  animation: bg 15s ease infinite;
+  animation: gradientMove 18s ease infinite;
 }
 
-@keyframes bg {
+@keyframes gradientMove {
   0%{background-position:0% 50%}
   50%{background-position:100% 50%}
   100%{background-position:0% 50%}
 }
 
+/* TITLE */
 h1 {
   text-align:center;
-  padding:12px;
-  font-size:18px;
+  font-size:20px;
+  font-weight:600;
+  padding:16px 10px 10px;
 }
 
 /* NAV */
 .nav {
   display:flex;
   justify-content:center;
-  gap:6px;
-  flex-wrap:wrap;
-  padding:8px;
+  gap:8px;
+  padding:10px;
 }
+
 .nav button {
-  padding:6px 10px;
-  border-radius:8px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
+  color:white;
   border:none;
-  font-weight:600;
+  padding:7px 12px;
+  border-radius:10px;
+  font-weight:500;
+  transition: all 0.3s ease;
 }
-.active { background:white; color:black; }
+
+.nav button.active {
+  background:white;
+  color:black;
+}
 
 /* SECTIONS */
-.section { display:none; padding:10px; }
+.section {
+  display:none;
+  padding:12px;
+  animation: fadeIn 0.4s ease;
+}
+
 .section.active { display:block; }
 
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(10px)}
+  to {opacity:1; transform:translateY(0)}
+}
+
+/* BUTTONS */
 button {
   border:none;
-  border-radius:8px;
-  padding:7px 10px;
-  font-weight:600;
+  border-radius:10px;
+  padding:8px 12px;
+  font-weight:500;
   cursor:pointer;
+  transition: all 0.2s ease;
 }
-button:active { transform:scale(0.92); }
 
-.red { background:red; color:white; }
+button:active { transform:scale(0.95); }
+
+.red {
+  background:#ff4d4d;
+  color:white;
+}
 
 /* RESIZER */
 .gallery {
-  max-width:340px;
-  margin:auto;
+  max-width:360px;
+  margin:15px auto;
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:14px;
 }
 
 .item {
   position:relative;
-  border-radius:10px;
+  border-radius:12px;
   overflow:hidden;
-  animation: fade 0.3s ease;
+  animation: smoothIn 0.4s ease;
+}
+
+@keyframes smoothIn {
+  from {opacity:0; transform:scale(0.96)}
+  to {opacity:1; transform:scale(1)}
 }
 
 .item img { width:100%; }
 
 .delete {
   position:absolute;
-  top:5px;
-  right:5px;
-  background:red;
+  top:6px;
+  right:6px;
+  background:#ff4d4d;
   color:white;
   font-size:12px;
 }
 
-@keyframes fade {
-  from {opacity:0; transform:translateY(8px)}
-  to {opacity:1;}
-}
-
 /* DROP */
 .drop {
-  margin:10px;
-  padding:20px;
-  border:2px dashed white;
+  margin:15px auto;
+  max-width:360px;
+  padding:24px;
+  border:2px dashed rgba(255,255,255,0.5);
+  border-radius:12px;
   text-align:center;
-  border-radius:10px;
+  transition:0.3s;
 }
 
-/* TEXT TOOL */
+.drop:hover {
+  background:rgba(255,255,255,0.1);
+}
+
+/* CONTROLS */
+.control {
+  max-width:360px;
+  margin:10px auto;
+  text-align:center;
+}
+
+input[type="range"] {
+  width:100%;
+}
+
+/* TEXT */
 .box {
-  max-width:340px;
+  max-width:360px;
   margin:auto;
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:10px;
 }
+
 textarea, input {
-  width:100%;
-  border-radius:8px;
   border:none;
-  padding:8px;
+  border-radius:10px;
+  padding:10px;
   font-size:14px;
 }
 
 /* GIF */
-canvas { width:100%; border-radius:10px; }
+canvas {
+  width:100%;
+  border-radius:12px;
+  margin-top:10px;
+}
 </style>
 </head>
 
@@ -134,13 +184,13 @@ canvas { width:100%; border-radius:10px; }
 <!-- RESIZER -->
 <div id="resizer" class="section active">
 
-<div style="text-align:center">
+<div class="control">
 Resolution
 <input type="range" id="quality" min="10" max="100" value="100">
 <span id="qval">100%</span>
 </div>
 
-<div style="text-align:center">
+<div class="control">
 <button id="clear" class="red">Clear All</button>
 </div>
 
@@ -153,7 +203,7 @@ Resolution
 <div id="text" class="section">
 <div class="box">
 
-<input type="text" id="input" placeholder="Type here...">
+<input id="input" placeholder="Type here...">
 
 <label><input type="checkbox" id="rev"> Reverse</label>
 <label><input type="checkbox" id="flip"> Upside Down</label>
@@ -168,14 +218,14 @@ Resolution
 <!-- GIF -->
 <div id="gif" class="section">
 
-<input type="file" id="gifInput" multiple>
+<div class="drop" onclick="pickGif()">Tap or Drop Images</div>
 
-<label>Speed</label>
+<div class="control">
+Speed: <span id="speedVal">0.4s</span>
 <input type="range" id="speed" min="100" max="1000" value="400">
+</div>
 
 <canvas id="gifCanvas"></canvas>
-
-<button onclick="makeGif()">Generate GIF</button>
 
 </div>
 
@@ -245,7 +295,7 @@ function process(img){
 document.getElementById("clear").onclick=()=>gallery.innerHTML="";
 
 /* TEXT */
-const map={'a':'ɐ','b':'q','c':'ɔ','d':'p','e':'ǝ','f':'ɟ','g':'ƃ','h':'ɥ','i':'ᴉ'};
+const map={'a':'ɐ','b':'q','c':'ɔ','d':'p','e':'ǝ'};
 function update(){
   let v=input.value;
   if(rev.checked) v=v.split('').reverse().join('');
@@ -261,28 +311,39 @@ function copy(){
 }
 
 /* GIF */
-function makeGif(){
-  const files=document.getElementById("gifInput").files;
-  const canvas=document.getElementById("gifCanvas");
-  const ctx=canvas.getContext("2d");
-  if(!files.length) return;
+let gifImgs=[];
+function pickGif(){
+  const i=document.createElement("input");
+  i.type="file"; i.multiple=true; i.accept="image/*";
+  i.onchange=e=>{
+    gifImgs=[...e.target.files].map(f=>{
+      const img=new Image();
+      img.src=URL.createObjectURL(f);
+      return img;
+    });
+    startGif();
+  };
+  i.click();
+}
+
+const canvas=document.getElementById("gifCanvas");
+const ctx=canvas.getContext("2d");
+
+function startGif(){
+  if(!gifImgs.length) return;
+  canvas.width=540;
+  canvas.height=960;
 
   let i=0;
-  const imgs=[...files].map(f=>{
-    const img=new Image();
-    img.src=URL.createObjectURL(f);
-    return img;
-  });
-
-  imgs[0].onload=()=>{
-    canvas.width=540;
-    canvas.height=960;
-    setInterval(()=>{
-      ctx.drawImage(imgs[i%imgs.length],0,0,540,960);
-      i++;
-    },speed.value);
-  }
+  setInterval(()=>{
+    ctx.drawImage(gifImgs[i%gifImgs.length],0,0,540,960);
+    i++;
+  },speed.value);
 }
+
+speed.oninput=()=>{
+  speedVal.textContent=(speed.value/1000).toFixed(1)+"s";
+};
 </script>
 
 </body>
