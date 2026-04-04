@@ -17,11 +17,14 @@ body {
   min-height:100vh;
   overflow-x:hidden;
   overflow-y:auto;
-  /* Fullscreen gradient background */
+  /* Solid fallback + fullscreen gradient */
+  background-color: #667eea;
   background: linear-gradient(120deg, #667eea, #764ba2, #ff758c, #ff7eb3);
   background-size: 600% 600%;
   animation: gradientBG 20s ease infinite;
 }
+
+/* Gradient animation */
 @keyframes gradientBG {
   0% {background-position:0% 50%;}
   50% {background-position:100% 50%;}
@@ -75,6 +78,7 @@ h1 {
   background: rgba(0,0,0,0.25);
   backdrop-filter: blur(8px);
   transition: opacity 0.4s ease;
+  position:relative;
 }
 .section.active {display:flex;}
 
@@ -128,7 +132,7 @@ button {border:none; border-radius:10px; padding:7px 10px; cursor:pointer; trans
 button:active {transform:scale(0.95);}
 .red {background:#ff4d4d; color:white;}
 
-/* --- Upside Down Text Box Emphasis --- */
+/* --- Upside Down Text Box --- */
 #text .box {
   max-width:320px;
   margin:0 auto;
@@ -146,6 +150,16 @@ button:active {transform:scale(0.95);}
   backdrop-filter: blur(6px);
   color:white;
   resize:none;
+}
+
+/* --- Toggles inline --- */
+#text label {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:14px;
+  background:none;
+  padding:0;
 }
 
 /* --- GIF Preview --- */
@@ -195,8 +209,10 @@ button:active {transform:scale(0.95);}
 <div id="text" class="section">
   <div class="box">
     <input id="input" placeholder="Type here...">
-    <label><input type="checkbox" id="flip"> Upside Down</label>
-    <label><input type="checkbox" id="reverse"> Reverse</label>
+    <div>
+      <label><input type="checkbox" id="flip"> Upside Down</label>
+      <label><input type="checkbox" id="reverse"> Reverse</label>
+    </div>
     <textarea id="out" rows="4" readonly></textarea>
     <button onclick="copyText()">Copy</button>
   </div>
