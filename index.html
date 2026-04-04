@@ -13,9 +13,16 @@ body {
   color:white;
   display:flex; flex-direction:column;
   min-height:100vh;
-  background: #4B6CB7; /* solid techie blue */
+  background: linear-gradient(270deg,#667eea,#764ba2,#ff758c,#ff7eb3);
+  background-size: 600% 600%;
+  animation: gradientBG 20s ease infinite;
   overflow-x:hidden;
   overflow-y:auto;
+}
+@keyframes gradientBG {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
 }
 h1 {text-align:center; font-size:28px; font-weight:800; letter-spacing:-0.5px; padding:20px 10px 10px;}
 .nav {display:flex; justify-content:center; gap:8px; padding:10px 0 20px;}
