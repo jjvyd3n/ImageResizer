@@ -12,6 +12,7 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 body {
   font-family:'Inter',system-ui,sans-serif;
@@ -100,7 +101,7 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; 
   </div>
   <div class="control">
     Speed: <span id="speedVal">5.00</span>
-    <input type="range" id="speed" min="0.1" max="10" step="0.01" value="5">
+    <input type="range" id="speed" min="0.01" max="10" step="0.01" value="5">
   </div>
   <div id="gifStatus" style="text-align:center; margin:8px 0;"></div>
   <img id="gifPreview">
@@ -120,6 +121,7 @@ const gallery=document.getElementById("gallery");
 const q=document.getElementById("quality");
 const qval=document.getElementById("qval");
 q.oninput=()=>qval.textContent=parseInt(q.value)+"%";
+
 function pick(){
   const i=document.createElement("input"); i.type="file"; i.multiple=true; i.accept="image/*";
   i.onchange=e=>handleFiles(e.target.files); i.click();
@@ -138,10 +140,12 @@ function handleFiles(files){
 function processImg(img){
   const c=document.createElement("canvas");
   const ctx=c.getContext("2d");
-  const scale=q.value/100;
-  c.width=img.width*scale; c.height=img.height*scale;
-  ctx.drawImage(img,0,0,c.width,c.height);
-  const url=c.toDataURL("image/jpeg",1);
+  // 9:16 stretch (main focus)
+  const targetWidth=360;
+  const targetHeight=640;
+  c.width=targetWidth; c.height=targetHeight;
+  ctx.drawImage(img,0,0,targetWidth,targetHeight);
+  const url=c.toDataURL("image/jpeg",q.value/100);
 
   const div=document.createElement("div");
   div.className="item";
@@ -218,7 +222,7 @@ function createGif(images){
     images: images.map(i=>i.src),
     gifWidth: Math.round(images[0].width*gifRes.value/100),
     gifHeight: Math.round(images[0].height*gifRes.value/100),
-    interval: 1/parseFloat(speed.value), // smaller = faster
+    interval: parseFloat(speed.value)/100, // speed fix
     numFrames: images.length,
     progressCallback: p=>{gifStatus.textContent="Generating GIF... "+Math.round(p*100)+"%";},
   };
@@ -227,8 +231,7 @@ function createGif(images){
       gifPreview.src=obj.image;
       gifStatus.textContent="GIF Ready! Tap to Save.";
       gifStatus.classList.remove("pulse");
-      gifList.innerHTML=""; // clear preview grid
-      gifImgs=[]; // clear images array
+      gifList.innerHTML=""; gifImgs=[];
       gifPreview.onclick=()=>download(obj.image,"animated.gif");
     } else {
       gifStatus.textContent="GIF Generation Failed.";
@@ -237,6 +240,5 @@ function createGif(images){
   });
 }
 </script>
-
 </body>
 </html>
