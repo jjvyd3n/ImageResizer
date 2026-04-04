@@ -1,36 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gradient Background</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Resizer Pro (9:16 Format)</title>
+<style>
+/* BODY & GRADIENT ANIMATION */
+body {
+  margin:0;
+  font-family: system-ui;
+  color:white;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fbc2eb);
+  background-size: 600% 600%;
+  animation: gradientAnim 15s ease infinite;
+}
 
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
-
-    body {
-      min-height: 100vh;
-      min-height: 100dvh;
-
-      background: linear-gradient(-45deg, #667eea, #764ba2, #ff758c, #ff7eb3);
-      background-size: 400% 400%;
-      animation: gradientBG 15s ease infinite;
-
-      color: #fff;
-      font-family: sans-serif;
-    }
-
-    @keyframes gradientBG {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-  </style>
-</head>
-<body>
-</body>
-</html>
+@keyframes gradientAnim {
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
