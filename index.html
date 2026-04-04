@@ -9,18 +9,12 @@
 <style>
 /* --- Reset & Font --- */
 * {box-sizing:border-box; margin:0; padding:0;}
-html, body {height:100%; width:100%; overflow-x:hidden; overflow-y:auto;}
-body {
-  font-family:'Inter',system-ui,sans-serif;
-  color:white;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-}
+html, body {height:100%; width:100%; overflow-x:hidden; font-family:'Inter',system-ui,sans-serif; color:white;}
+body {display:flex; flex-direction:column; min-height:100vh;}
 
-/* --- Fullscreen gradient layer --- */
+/* --- Fullscreen gradient --- */
 #gradientBG {
-  position: fixed;
+  position:fixed;
   top:0; left:0;
   width:100%;
   height:100%;
@@ -159,19 +153,26 @@ button:active {transform:scale(0.95);}
   box-sizing:border-box;
 }
 
-/* --- Toggles inline --- */
+/* --- Toggles aligned properly --- */
 #text .toggles {
   display:flex;
   justify-content:center;
   gap:20px;
+  margin-bottom:10px;
 }
-#text .toggles label {
+#text .toggle-item {
   display:flex;
   align-items:center;
   gap:6px;
   font-size:14px;
-  background:none;
-  padding:0;
+}
+#text .toggle-item input[type="checkbox"] {
+  transform: scale(1.2);
+  cursor:pointer;
+}
+#text .toggle-item label {
+  cursor:pointer;
+  margin:0;
 }
 
 /* --- GIF Preview --- */
@@ -183,17 +184,6 @@ button:active {transform:scale(0.95);}
 }
 .pulse {animation: pulse 1s infinite;}
 @keyframes pulse {0%{opacity:0.3;}50%{opacity:1;}100%{opacity:0.3;}}
-
-/* --- Decorative Panels --- */
-.section::before {
-  content:'';
-  position:absolute;
-  top:0; left:0;
-  width:100%; height:100%;
-  border-radius:16px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.25);
-  pointer-events:none;
-}
 </style>
 </head>
 <body>
@@ -224,8 +214,14 @@ button:active {transform:scale(0.95);}
   <div class="box">
     <input id="input" placeholder="Type here...">
     <div class="toggles">
-      <label><input type="checkbox" id="flip"> Upside Down</label>
-      <label><input type="checkbox" id="reverse"> Reverse</label>
+      <div class="toggle-item">
+        <input type="checkbox" id="flip">
+        <label for="flip">Upside Down</label>
+      </div>
+      <div class="toggle-item">
+        <input type="checkbox" id="reverse">
+        <label for="reverse">Reverse</label>
+      </div>
     </div>
     <textarea id="out" rows="4" readonly></textarea>
     <button onclick="copyText()">Copy</button>
