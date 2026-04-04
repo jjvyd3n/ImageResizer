@@ -10,13 +10,15 @@
 /* FULL SCREEN GRADIENT FIXED */
 html, body {
   margin:0; padding:0; width:100%; height:100%;
+  position:fixed;
+  top:0; left:0; right:0; bottom:0;
 }
 
 body {
   display:flex; flex-direction:column;
-  min-height:100vh; /* ensures gradient fills viewport */
   background: linear-gradient(270deg,#667eea,#764ba2,#ff758c,#ff7eb3);
   background-size: 600% 600%;
+  background-attachment: fixed;
   animation: gradientBG 20s ease infinite;
   color:white;
   font-family:'Inter',system-ui,sans-serif;
