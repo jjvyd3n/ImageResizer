@@ -8,7 +8,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
 <style>
 /* --- Reset & Font --- */
-html, body {margin:0; padding:0; height:100%; width:100%;}
+* {box-sizing:border-box; margin:0; padding:0;}
+html, body {height:100%; width:100%;}
 body {
   font-family:'Inter',system-ui,sans-serif;
   color:white;
@@ -17,6 +18,7 @@ body {
   min-height:100vh;
   overflow-x:hidden;
   overflow-y:auto;
+
   /* Solid fallback + fullscreen gradient */
   background-color: #667eea;
   background: linear-gradient(120deg, #667eea, #764ba2, #ff758c, #ff7eb3);
@@ -134,7 +136,7 @@ button:active {transform:scale(0.95);}
 
 /* --- Upside Down Text Box --- */
 #text .box {
-  max-width:320px;
+  max-width:100%;
   margin:0 auto;
   display:flex;
   flex-direction:column;
@@ -150,6 +152,7 @@ button:active {transform:scale(0.95);}
   backdrop-filter: blur(6px);
   color:white;
   resize:none;
+  box-sizing:border-box;
 }
 
 /* --- Toggles inline --- */
@@ -301,77 +304,6 @@ function updateText(){
   out.value=v;
 }
 function copyText(){navigator.clipboard.writeText(out.value);}
-
-// --- GIF Generator ---
-let gifImgs=[];
-const gifList=document.getElementById("gifList");
-const gifPreview=document.getElementById("gifPreview");
-const gifStatus=document.getElementById("gifStatus");
-const speed=document.getElementById("speed");
-const speedNum=document.getElementById("speedNum");
-const speedVal=document.getElementById("speedVal");
-
-speed.oninput=()=>{ speedVal.textContent=parseFloat(speed.value).toFixed(2); speedNum.value=parseFloat(speed.value).toFixed(2);}
-speedNum.oninput=()=>{
-  let v=parseFloat(speedNum.value);
-  if(v<0.01)v=0.01; if(v>10)v=10;
-  speed.value=v; speedVal.textContent=v.toFixed(2);
-};
-
-function pickGif(){
-  const i=document.createElement("input"); i.type="file"; i.multiple=true; i.accept="image/*";
-  i.onchange=e=>{gifImgs=[...gifImgs,...e.target.files]; renderGifList();};
-  i.click();
-}
-function renderGifList(){
-  gifList.innerHTML="";
-  gifImgs.forEach((file,index)=>{
-    const div=document.createElement("div"); div.className="gif-item";
-    const img=document.createElement("img"); img.src=URL.createObjectURL(file);
-    const del=document.createElement("button"); del.textContent="X"; del.className="delete";
-    del.onclick=()=>{gifImgs.splice(index,1); renderGifList();};
-    div.appendChild(img); div.appendChild(del); gifList.appendChild(div);
-  });
-}
-function clearGif(){ gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; gifStatus.textContent=""; }
-
-function generateGif(){
-  if(!gifImgs.length) return;
-  gifList.style.display="none";
-  gifPreview.src=""; 
-  gifStatus.textContent="Generating GIF..."; gifStatus.classList.add("pulse");
-
-  const images=[];
-  let loaded=0;
-  gifImgs.forEach(f=>{
-    const img=new Image();
-    img.onload=()=>{loaded++; if(loaded===gifImgs.length) createGif(images);};
-    img.src=URL.createObjectURL(f); images.push(img);
-  });
-}
-
-function createGif(images){
-  const options={
-    images: images.map(i=>i.src),
-    gifWidth: images[0].width,
-    gifHeight: images[0].height,
-    interval: parseFloat(speed.value),
-    numFrames: images.length,
-    progressCallback: p=>{gifStatus.textContent="Generating GIF... "+Math.round(p*100)+"%";}
-  };
-  gifshot.createGIF(options,function(obj){
-    if(!obj.error){
-      gifPreview.src=obj.image;
-      gifStatus.textContent="GIF Ready! Tap to Save.";
-      gifStatus.classList.remove("pulse");
-      gifImgs=[]; gifList.style.display="flex"; gifList.innerHTML="";
-      gifPreview.onclick=()=>download(obj.image,"animated.gif");
-    } else {
-      gifStatus.textContent="GIF Generation Failed.";
-      gifStatus.classList.remove("pulse");
-    }
-  });
-}
 </script>
 </body>
 </html>
