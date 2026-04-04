@@ -12,7 +12,6 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
-  overflow-x: hidden;
 }
 body {
   font-family:'Inter',system-ui,sans-serif;
@@ -22,7 +21,7 @@ body {
   min-height:100vh;
   background: linear-gradient(270deg,#667eea,#764ba2,#ff758c,#ff7eb3);
   background-size: 800% 800%;
-  animation: gradientBG 20s ease infinite;
+  animation: gradientBG 10s linear infinite;
 }
 @keyframes gradientBG {
   0% {background-position:0% 50%;}
@@ -101,7 +100,7 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; 
   </div>
   <div class="control">
     Speed: <span id="speedVal">5.00</span>
-    <input type="range" id="speed" min="0.01" max="10" step="0.01" value="5">
+    <input type="range" id="speed" min="0.1" max="10" step="0.01" value="5">
   </div>
   <div id="gifStatus" style="text-align:center; margin:8px 0;"></div>
   <img id="gifPreview">
@@ -219,7 +218,7 @@ function createGif(images){
     images: images.map(i=>i.src),
     gifWidth: Math.round(images[0].width*gifRes.value/100),
     gifHeight: Math.round(images[0].height*gifRes.value/100),
-    interval: 1/parseFloat(speed.value),
+    interval: 1/parseFloat(speed.value), // smaller = faster
     numFrames: images.length,
     progressCallback: p=>{gifStatus.textContent="Generating GIF... "+Math.round(p*100)+"%";},
   };
