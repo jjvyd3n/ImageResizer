@@ -21,3 +21,168 @@ body {
   50%{background-position:100% 50%}
   100%{background-position:0% 50%}
 }
+
+/* HEADER */
+h1 {
+  text-align:center;
+  padding:14px;
+  font-size:18px;
+}
+
+/* TOPBAR */
+.topbar {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+  padding:10px;
+}
+
+button, input {
+  padding:7px 10px;
+  border-radius:8px;
+  border:none;
+  font-weight:600;
+}
+
+button {
+  cursor:pointer;
+  transition: transform 0.15s;
+}
+
+button:active { transform: scale(0.92); }
+
+#clear { background:red; color:white; }
+
+.slider-wrap {
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:12px;
+}
+
+/* DROP ZONE */
+#drop {
+  margin:10px;
+  padding:22px;
+  border:2px dashed white;
+  border-radius:10px;
+  text-align:center;
+}
+
+/* GALLERY */
+.gallery {
+  max-width:340px;
+  margin:auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding-bottom:40px;
+}
+
+.item {
+  position:relative;
+  border-radius:10px;
+  overflow:hidden;
+  animation: fadeScale 0.35s ease;
+}
+
+.item img { width:100%; }
+
+.delete {
+  position:absolute;
+  top:5px;
+  right:5px;
+  background:red;
+  color:white;
+  font-size:11px;
+}
+
+/* ANIMATION */
+@keyframes fadeScale {
+  from {opacity:0; transform:scale(0.96) translateY(8px);}
+  to {opacity:1; transform:scale(1) translateY(0);}
+}
+</style>
+</head>
+<body>
+
+<h1>Image Resizer Pro (9:16 Format)</h1>
+
+<div class="topbar">
+  <div class="slider-wrap">
+    <span>Resolution</span>
+    <input type="range" id="quality" min="10" max="100" step="1" value="100">
+    <span id="qval">100%</span>
+  </div>
+  <button id="clear">Clear</button>
+</div>
+
+<div id="drop">Tap or Drop Images</div>
+<div class="gallery" id="gallery"></div>
+
+<script>
+const qualitySlider = document.getElementById("quality");
+const qval = document.getElementById("qval");
+const gallery = document.getElementById("gallery");
+const clearBtn = document.getElementById("clear");
+
+qval.textContent = qualitySlider.value + "%";
+qualitySlider.oninput = ()=> { qval.textContent = qualitySlider.value + "%"; };
+
+clearBtn.onclick = ()=> gallery.innerHTML="";
+
+/* IMAGE INPUT */
+document.getElementById("drop").onclick = ()=>{
+  const input = document.createElement("input");
+  input.type="file";
+  input.multiple=true;
+  input.accept="image/*";
+  input.onchange = e => handleFiles(e.target.files);
+  input.click();
+};
+
+function handleFiles(files){
+  [...files].forEach(file=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>process(img);
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* PROCESS IMAGE - STRETCH MODE ONLY */
+function process(img){
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  const baseW = 540, baseH = 960;
+  const scale = qualitySlider.value / 100;
+  canvas.width = baseW * scale;
+  canvas.height = baseH * scale;
+
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+
+  const url = canvas.toDataURL("image/jpeg", 1);
+
+  const div = document.createElement("div");
+  div.className="item";
+
+  const image = document.createElement("img");
+  image.src = url;
+
+  const del = document.createElement("button");
+  del.textContent="X";
+  del.className="delete";
+  del.onclick = ()=>div.remove();
+
+  div.appendChild(image);
+  div.appendChild(del);
+  gallery.appendChild(div);
+}
+</script>
+</body>
+</html>
