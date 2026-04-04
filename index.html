@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Image Toolkit Pro</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
-
 <style>
+/* GENERAL */
 html, body {margin:0; padding:0; height:100%; width:100%;}
 body {
   font-family:'Inter',system-ui,sans-serif;
@@ -16,28 +15,36 @@ body {
   display:flex; flex-direction:column;
   min-height:100vh;
   background: linear-gradient(270deg,#667eea,#764ba2,#ff758c,#ff7eb3);
-  background-size:600% 600%;
-  animation:gradientBG 20s ease infinite;
+  background-size: 600% 600%;
+  animation: gradientBG 20s ease infinite;
+  overflow-x:hidden;
+  overflow-y:auto;
+  transition: background 0.5s ease;
 }
 @keyframes gradientBG {
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
 }
 
-h1 {text-align:center; font-size:28px; font-weight:800; padding:20px 10px 10px;}
+/* HEADER */
+h1 {text-align:center; font-size:28px; font-weight:800; letter-spacing:-0.5px; padding:20px 10px 10px;}
 
-.nav {display:flex; justify-content:center; gap:8px; padding:10px 0;}
+/* NAV / TABS */
+.nav {display:flex; justify-content:center; gap:8px; padding:10px 0 0; position:relative;}
 .nav button {
-  background:rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
   color:white;
   border:none;
   padding:6px 10px;
   border-radius:10px;
+  transition: all 0.3s ease;
   position:relative;
+  font-weight:500;
 }
-.nav button.active {color:black;}
-.nav button.active::after{
+.nav button.active {color:black; font-weight:700;}
+.nav button.active::after {
   content:"";
   position:absolute;
   bottom:-3px;
@@ -45,35 +52,44 @@ h1 {text-align:center; font-size:28px; font-weight:800; padding:20px 10px 10px;}
   width:100%;
   height:3px;
   background:white;
+  border-radius:2px;
+  transition: all 0.3s ease;
 }
 
-.section {display:none; flex:1; padding:12px;}
-.section.active {display:flex; flex-direction:column;}
+/* SECTIONS */
+.section {display:none; flex:1; padding:12px; opacity:0; transform:translateY(5px); transition: all 0.4s ease;}
+.section.active {display:flex; flex-direction:column; opacity:1; transform:translateY(0);}
 
-button {border:none; border-radius:10px; padding:7px 10px; cursor:pointer;}
-.red {background:#ff4d4d;}
+/* BUTTONS */
+button {border:none; border-radius:10px; padding:7px 10px; cursor:pointer; transition:transform 0.2s ease;}
+button:active {transform:scale(0.95);}
+.red {background:#ff4d4d; color:white;}
 
-.gallery {max-width:360px; margin:15px auto; display:flex; flex-direction:column; gap:8px;}
-.item {position:relative;}
-.item img {width:100%;}
-.delete {position:absolute; top:6px; right:6px;}
+/* GALLERY & DROP */
+.gallery {max-width:360px; margin:15px auto; display:flex; flex-direction:column; gap:8px; overflow-y:auto;}
+.item {position:relative; opacity:0; animation: fadeIn 0.4s forwards;}
+.item img {width:100%; cursor:pointer; border-radius:10px;}
+.delete {position:absolute; top:6px; right:6px; background:#ff4d4d; color:white; font-size:12px; cursor:pointer;}
+.drop {margin:15px auto; max-width:360px; padding:22px; border:2px dashed rgba(255,255,255,0.5); border-radius:12px; text-align:center; cursor:pointer; transition: all 0.2s ease;}
+.drop:hover {background:rgba(255,255,255,0.05);}
 
-.drop {margin:15px auto; max-width:360px; padding:22px; border:2px dashed white; border-radius:12px; text-align:center; cursor:pointer;}
-
-.control {max-width:300px; margin:10px auto; text-align:center;}
+/* INPUTS */
+.control {max-width:300px; margin:10px auto; text-align:center; font-size:14px;}
+input[type="range"] {width:70%; margin-right:6px;}
+input[type="number"] {width:60px;}
 .box {max-width:360px; margin:auto; display:flex; flex-direction:column; gap:10px;}
-textarea, input {border:none; border-radius:10px; padding:10px;}
+textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; resize:none;}
 
+/* GIF LIST */
 .gif-list {display:flex; flex-wrap:wrap; gap:8px; max-width:360px; margin:10px auto;}
-.gif-item {width:80px; height:80px;}
-.gif-item img {width:100%; height:100%; object-fit:cover;}
-
-#gifPreview {max-width:360px; margin:10px auto; display:block;}
-.pulse {animation:pulse 1s infinite;}
+.gif-item {position:relative; width:80px; height:80px; overflow:hidden; border-radius:12px;}
+.gif-item img {width:100%; height:100%; object-fit:cover; cursor:pointer;}
+#gifPreview {max-width:360px; margin:10px auto; border-radius:12px; display:block;}
+.pulse {animation: pulse 1s infinite;}
 @keyframes pulse {0%{opacity:0.3;}50%{opacity:1;}100%{opacity:0.3;}}
+@keyframes fadeIn {0%{opacity:0; transform:translateY(5px);} 100%{opacity:1; transform:translateY(0);}}
 </style>
 </head>
-
 <body>
 
 <h1>Image Toolkit Pro</h1>
@@ -84,23 +100,18 @@ textarea, input {border:none; border-radius:10px; padding:10px;}
   <button onclick="show('gif',this)">GIF Generator</button>
 </div>
 
-<!-- RESIZER -->
+<!-- IMAGE RESIZER -->
 <div id="resizer" class="section active">
   <div class="control">
-    Resolution:
-    <input type="range" id="quality" min="10" max="100" value="100">
+    Resolution: <input type="range" id="quality" min="10" max="100" value="100">
     <span id="qval">100%</span>
   </div>
-
-  <div class="control">
-    <button id="clear" class="red">Clear All</button>
-  </div>
-
+  <div class="control"><button id="clear" class="red">Clear All</button></div>
   <div class="drop" onclick="pick()">Tap or Drop Images</div>
   <div class="gallery" id="gallery"></div>
 </div>
 
-<!-- TEXT -->
+<!-- UPSIDE DOWN TEXT -->
 <div id="text" class="section">
   <div class="box">
     <input id="input" placeholder="Type here...">
@@ -111,27 +122,26 @@ textarea, input {border:none; border-radius:10px; padding:10px;}
   </div>
 </div>
 
-<!-- GIF -->
+<!-- GIF GENERATOR -->
 <div id="gif" class="section">
   <div class="drop" onclick="pickGif()">Tap or Drop Images</div>
   <div class="gif-list" id="gifList"></div>
-
   <div class="control">
     <button class="red" onclick="clearGif()">Clear All</button>
     <button onclick="generateGif()">Generate GIF</button>
   </div>
-
   <div class="control">
     Speed (sec/frame):
     <input type="range" id="speed" min="0.01" max="10" step="0.01" value="5">
+    <input type="number" id="speedNum" min="0.01" max="10" step="0.01" value="5">
+    <span id="speedVal">5.00</span>
   </div>
-
-  <div id="gifStatus"></div>
+  <div id="gifStatus" style="text-align:center; margin:8px 0;"></div>
   <img id="gifPreview">
 </div>
 
 <script>
-// NAV
+// TABS
 function show(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -139,189 +149,148 @@ function show(id,btn){
   btn.classList.add('active');
 }
 
-// RESIZER
+// IMAGE RESIZER
 const gallery=document.getElementById("gallery");
 const quality=document.getElementById("quality");
 const qval=document.getElementById("qval");
-
-quality.oninput=()=>qval.textContent=quality.value+"%";
-
-document.getElementById("clear").onclick=()=>gallery.innerHTML="";
+quality.oninput=()=>qval.textContent=parseInt(quality.value)+"%";
 
 function pick(){
-  const i=document.createElement("input");
-  i.type="file"; i.multiple=true; i.accept="image/*";
-  i.onchange=e=>{
-    [...e.target.files].forEach(f=>{
-      const r=new FileReader();
-      r.onload=e=>{
-        const img=new Image();
-        img.onload=()=>processImg(img);
-        img.src=e.target.result;
-      };
-      r.readAsDataURL(f);
-    });
-  };
-  i.click();
+  const i=document.createElement("input"); i.type="file"; i.multiple=true; i.accept="image/*";
+  i.onchange=e=>handleFiles(e.target.files); i.click();
 }
 
-// 🔥 FIXED QUALITY (pixelation)
+function handleFiles(files){
+  [...files].forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=new Image();
+      img.onload=()=>processImg(img);
+      img.src=e.target.result;
+    };
+    r.readAsDataURL(f);
+  });
+}
+
 function processImg(img){
-  const baseW=360, baseH=640;
-  const q=quality.value/100;
+  const canvasWidth=360;
+  const canvasHeight=640;
+  const c=document.createElement("canvas");
+  c.width=canvasWidth;
+  c.height=canvasHeight;
+  const ctx=c.getContext("2d");
 
-  const small=document.createElement("canvas");
-  small.width=baseW*q;
-  small.height=baseH*q;
-  const sctx=small.getContext("2d");
+  const scale = Math.max(canvasWidth/img.width, canvasHeight/img.height);
+  const w = img.width * scale;
+  const h = img.height * scale;
+  const x = (canvasWidth - w)/2;
+  const y = (canvasHeight - h)/2;
+  ctx.drawImage(img, x, y, w, h);
 
-  const scale=Math.max(small.width/img.width,small.height/img.height);
-  const w=img.width*scale;
-  const h=img.height*scale;
-  const x=(small.width-w)/2;
-  const y=(small.height-h)/2;
-
-  sctx.drawImage(img,x,y,w,h);
-
-  const final=document.createElement("canvas");
-  final.width=baseW;
-  final.height=baseH;
-  const fctx=final.getContext("2d");
-
-  fctx.imageSmoothingEnabled=false;
-  fctx.drawImage(small,0,0,baseW,baseH);
-
-  const url=final.toDataURL("image/jpeg",q);
-
+  const url=c.toDataURL("image/jpeg", quality.value/100);
   const div=document.createElement("div");
   div.className="item";
-
-  const im=document.createElement("img");
-  im.src=url;
-  im.onclick=()=>download(url);
-
-  const del=document.createElement("button");
-  del.textContent="X"; del.className="delete";
+  const image=document.createElement("img"); image.src=url;
+  image.onclick=()=>download(url,"resized.jpg");
+  const del=document.createElement("button"); del.textContent="X"; del.className="delete";
   del.onclick=()=>div.remove();
-
-  div.appendChild(im);
-  div.appendChild(del);
-  gallery.appendChild(div);
+  div.appendChild(image); div.appendChild(del); gallery.appendChild(div);
 }
+document.getElementById("clear").onclick=()=>gallery.innerHTML="";
+function download(src,name){const a=document.createElement("a"); a.href=src; a.download=name; a.click();}
 
-function download(src){
-  const a=document.createElement("a");
-  a.href=src; a.download="resized.jpg"; a.click();
-}
-
-// TEXT
+// TEXT TOOL
 const input=document.getElementById("input");
 const flip=document.getElementById("flip");
 const reverse=document.getElementById("reverse");
 const out=document.getElementById("out");
-
-input.oninput=updateText;
-flip.onchange=updateText;
-reverse.onchange=updateText;
-
+const upsideMap = {"a":"ɐ","b":"q","c":"ɔ","d":"p","e":"ǝ","f":"ɟ","g":"ƃ","h":"ɥ","i":"ᴉ","j":"ɾ","k":"ʞ","l":"l","m":"ɯ","n":"u","o":"o","p":"d","q":"b","r":"ɹ","s":"s","t":"ʇ","u":"n","v":"ʌ","w":"ʍ","x":"x","y":"ʎ","z":"z","A":"∀","B":"𐐒","C":"Ɔ","D":"p","E":"Ǝ","F":"Ⅎ","G":"פ","H":"H","I":"I","J":"ſ","K":"ʞ","L":"˥","M":"W","N":"N","O":"O","P":"Ԁ","Q":"Q","R":"ɹ","S":"S","T":"⊥","U":"∩","V":"Λ","W":"M","X":"X","Y":"⅄","Z":"Z"};
+input.oninput=updateText; flip.onchange=updateText; reverse.onchange=updateText;
 function updateText(){
   let v=input.value;
   if(reverse.checked) v=v.split('').reverse().join('');
-  if(flip.checked) v=v.split('').reverse().join('');
+  if(flip.checked) v=v.split('').map(c=>upsideMap[c]||c).reverse().join('');
   out.value=v;
 }
-
 function copyText(){navigator.clipboard.writeText(out.value);}
 
-// GIF
+// GIF GENERATOR
 let gifImgs=[];
 const gifList=document.getElementById("gifList");
 const gifPreview=document.getElementById("gifPreview");
 const gifStatus=document.getElementById("gifStatus");
 const speed=document.getElementById("speed");
+const speedNum=document.getElementById("speedNum");
+const speedVal=document.getElementById("speedVal");
+
+speed.oninput=()=>{ speedVal.textContent=parseFloat(speed.value).toFixed(2); speedNum.value=parseFloat(speed.value).toFixed(2);}
+speedNum.oninput=()=>{
+  let v=parseFloat(speedNum.value);
+  if(v<0.01)v=0.01; if(v>10)v=10;
+  speed.value=v; speedVal.textContent=v.toFixed(2);
+};
 
 function pickGif(){
-  const i=document.createElement("input");
-  i.type="file"; i.multiple=true;
-  i.onchange=e=>{
-    gifImgs=[...gifImgs,...e.target.files];
-    renderGif();
-  };
+  const i=document.createElement("input"); i.type="file"; i.multiple=true; i.accept="image/*";
+  i.onchange=e=>{gifImgs=[...gifImgs,...e.target.files]; renderGifList();};
   i.click();
 }
 
-function renderGif(){
+function renderGifList(){
   gifList.innerHTML="";
-  gifImgs.forEach((f,i)=>{
-    const div=document.createElement("div");
-    div.className="gif-item";
-
-    const img=document.createElement("img");
-    img.src=URL.createObjectURL(f);
-
-    div.onclick=()=>{gifImgs.splice(i,1); renderGif();};
-
-    div.appendChild(img);
-    gifList.appendChild(div);
+  gifImgs.forEach((file,index)=>{
+    const div=document.createElement("div"); div.className="gif-item";
+    const img=document.createElement("img"); img.src=URL.createObjectURL(file);
+    const del=document.createElement("button"); del.textContent="X"; del.className="delete";
+    del.onclick=()=>{gifImgs.splice(index,1); renderGifList();};
+    div.appendChild(img); div.appendChild(del); gifList.appendChild(div);
   });
 }
 
-function clearGif(){gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; gifStatus.textContent="";}
+function clearGif(){ gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; gifStatus.textContent=""; }
 
-// 🔥 FIXED GIF (no crash)
 function generateGif(){
   if(!gifImgs.length) return;
+  gifList.style.display="none";
+  gifPreview.src=""; 
+  gifStatus.textContent="Generating GIF..."; gifStatus.classList.add("pulse");
 
-  gifStatus.textContent="Generating...";
-  gifStatus.classList.add("pulse");
-
-  const imgs=[];
+  const images=[];
   let loaded=0;
-
   gifImgs.forEach(f=>{
     const img=new Image();
     img.onload=()=>{
       loaded++;
-      if(loaded===gifImgs.length) createGif(imgs);
+      if(loaded===gifImgs.length) createGif(images);
     };
     img.src=URL.createObjectURL(f);
-    imgs.push(img);
+    images.push(img);
   });
 }
 
 function createGif(images){
-  const MAX=480;
-
-  const processed=images.map(img=>{
-    const scale=Math.min(1,MAX/Math.max(img.width,img.height));
-    const w=img.width*scale;
-    const h=img.height*scale;
-
-    const c=document.createElement("canvas");
-    c.width=w; c.height=h;
-
-    const ctx=c.getContext("2d");
-    ctx.drawImage(img,0,0,w,h);
-
-    return c.toDataURL("image/jpeg",0.8);
-  });
-
-  gifshot.createGIF({
-    images:processed,
-    interval:parseFloat(speed.value)
-  },obj=>{
-    gifStatus.classList.remove("pulse");
-
+  const options={
+    images: images.map(i=>i.src),
+    gifWidth: images[0].width,
+    gifHeight: images[0].height,
+    interval: parseFloat(speed.value),
+    numFrames: images.length,
+    progressCallback: p=>{gifStatus.textContent="Generating GIF... "+Math.round(p*100)+"%";}
+  };
+  gifshot.createGIF(options,function(obj){
     if(!obj.error){
       gifPreview.src=obj.image;
-      gifStatus.textContent="GIF Ready!";
-      gifPreview.onclick=()=>download(obj.image);
+      gifStatus.textContent="GIF Ready! Tap to Save.";
+      gifStatus.classList.remove("pulse");
+      gifImgs=[]; gifList.style.display="flex"; gifList.innerHTML="";
+      gifPreview.onclick=()=>download(obj.image,"animated.gif");
     } else {
-      gifStatus.textContent="Failed";
+      gifStatus.textContent="GIF Generation Failed.";
+      gifStatus.classList.remove("pulse");
+      gifList.style.display="flex";
     }
   });
 }
 </script>
-
 </body>
 </html>
