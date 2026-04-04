@@ -149,7 +149,7 @@ function show(id,btn){
   btn.classList.add('active');
 }
 
-// IMAGE RESIZER
+// IMAGE RESIZER (FIXED QUALITY)
 const gallery=document.getElementById("gallery");
 const quality=document.getElementById("quality");
 const qval=document.getElementById("qval");
@@ -173,111 +173,59 @@ function handleFiles(files){
 }
 
 function processImg(img){
-  const canvasWidth=360;
-  const canvasHeight=640;
-  const c=document.createElement("canvas");
-  c.width=canvasWidth;
-  c.height=canvasHeight;
-  const ctx=c.getContext("2d");
+  const W=360, H=640;
+  const q=quality.value/100;
 
-  const scale = Math.max(canvasWidth/img.width, canvasHeight/img.height);
-  const w = img.width * scale;
-  const h = img.height * scale;
-  const x = (canvasWidth - w)/2;
-  const y = (canvasHeight - h)/2;
-  ctx.drawImage(img, x, y, w, h);
+  const small=document.createElement("canvas");
+  small.width=W*q;
+  small.height=H*q;
+  const sctx=small.getContext("2d");
 
-  const url=c.toDataURL("image/jpeg", quality.value/100);
+  const scale=Math.max(small.width/img.width, small.height/img.height);
+  const w=img.width*scale;
+  const h=img.height*scale;
+  sctx.drawImage(img,(small.width-w)/2,(small.height-h)/2,w,h);
+
+  const final=document.createElement("canvas");
+  final.width=W; final.height=H;
+  const fctx=final.getContext("2d");
+  fctx.imageSmoothingEnabled=false;
+  fctx.drawImage(small,0,0,W,H);
+
+  const url=final.toDataURL("image/jpeg",q);
+
   const div=document.createElement("div");
   div.className="item";
   const image=document.createElement("img"); image.src=url;
   image.onclick=()=>download(url,"resized.jpg");
+
   const del=document.createElement("button"); del.textContent="X"; del.className="delete";
   del.onclick=()=>div.remove();
-  div.appendChild(image); div.appendChild(del); gallery.appendChild(div);
+
+  div.appendChild(image); div.appendChild(del);
+  gallery.appendChild(div);
 }
+
 document.getElementById("clear").onclick=()=>gallery.innerHTML="";
 function download(src,name){const a=document.createElement("a"); a.href=src; a.download=name; a.click();}
 
-// TEXT TOOL
-const input=document.getElementById("input");
-const flip=document.getElementById("flip");
-const reverse=document.getElementById("reverse");
-const out=document.getElementById("out");
-const upsideMap = {"a":"ɐ","b":"q","c":"ɔ","d":"p","e":"ǝ","f":"ɟ","g":"ƃ","h":"ɥ","i":"ᴉ","j":"ɾ","k":"ʞ","l":"l","m":"ɯ","n":"u","o":"o","p":"d","q":"b","r":"ɹ","s":"s","t":"ʇ","u":"n","v":"ʌ","w":"ʍ","x":"x","y":"ʎ","z":"z","A":"∀","B":"𐐒","C":"Ɔ","D":"p","E":"Ǝ","F":"Ⅎ","G":"פ","H":"H","I":"I","J":"ſ","K":"ʞ","L":"˥","M":"W","N":"N","O":"O","P":"Ԁ","Q":"Q","R":"ɹ","S":"S","T":"⊥","U":"∩","V":"Λ","W":"M","X":"X","Y":"⅄","Z":"Z"};
-input.oninput=updateText; flip.onchange=updateText; reverse.onchange=updateText;
-function updateText(){
-  let v=input.value;
-  if(reverse.checked) v=v.split('').reverse().join('');
-  if(flip.checked) v=v.split('').map(c=>upsideMap[c]||c).reverse().join('');
-  out.value=v;
-}
-function copyText(){navigator.clipboard.writeText(out.value);}
-
-// GIF GENERATOR
-let gifImgs=[];
-const gifList=document.getElementById("gifList");
-const gifPreview=document.getElementById("gifPreview");
-const gifStatus=document.getElementById("gifStatus");
-const speed=document.getElementById("speed");
-const speedNum=document.getElementById("speedNum");
-const speedVal=document.getElementById("speedVal");
-
-speed.oninput=()=>{ speedVal.textContent=parseFloat(speed.value).toFixed(2); speedNum.value=parseFloat(speed.value).toFixed(2);}
-speedNum.oninput=()=>{
-  let v=parseFloat(speedNum.value);
-  if(v<0.01)v=0.01; if(v>10)v=10;
-  speed.value=v; speedVal.textContent=v.toFixed(2);
-};
-
-function pickGif(){
-  const i=document.createElement("input"); i.type="file"; i.multiple=true; i.accept="image/*";
-  i.onchange=e=>{gifImgs=[...gifImgs,...e.target.files]; renderGifList();};
-  i.click();
-}
-
-function renderGifList(){
-  gifList.innerHTML="";
-  gifImgs.forEach((file,index)=>{
-    const div=document.createElement("div"); div.className="gif-item";
-    const img=document.createElement("img"); img.src=URL.createObjectURL(file);
-    const del=document.createElement("button"); del.textContent="X"; del.className="delete";
-    del.onclick=()=>{gifImgs.splice(index,1); renderGifList();};
-    div.appendChild(img); div.appendChild(del); gifList.appendChild(div);
-  });
-}
-
-function clearGif(){ gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; gifStatus.textContent=""; }
-
-function generateGif(){
-  if(!gifImgs.length) return;
-  gifList.style.display="none";
-  gifPreview.src=""; 
-  gifStatus.textContent="Generating GIF..."; gifStatus.classList.add("pulse");
-
-  const images=[];
-  let loaded=0;
-  gifImgs.forEach(f=>{
-    const img=new Image();
-    img.onload=()=>{
-      loaded++;
-      if(loaded===gifImgs.length) createGif(images);
-    };
-    img.src=URL.createObjectURL(f);
-    images.push(img);
-  });
-}
-
+// GIF FIX (NO CRASH)
 function createGif(images){
-  const options={
-    images: images.map(i=>i.src),
-    gifWidth: images[0].width,
-    gifHeight: images[0].height,
-    interval: parseFloat(speed.value),
-    numFrames: images.length,
-    progressCallback: p=>{gifStatus.textContent="Generating GIF... "+Math.round(p*100)+"%";}
-  };
-  gifshot.createGIF(options,function(obj){
+  const MAX=480;
+
+  const processed=images.map(img=>{
+    const scale=Math.min(1,MAX/Math.max(img.width,img.height));
+    const c=document.createElement("canvas");
+    c.width=img.width*scale;
+    c.height=img.height*scale;
+    c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    return c.toDataURL("image/jpeg",0.8);
+  });
+
+  gifshot.createGIF({
+    images:processed,
+    interval:parseFloat(speed.value)
+  },function(obj){
     if(!obj.error){
       gifPreview.src=obj.image;
       gifStatus.textContent="GIF Ready! Tap to Save.";
@@ -292,5 +240,6 @@ function createGif(images){
   });
 }
 </script>
+
 </body>
 </html>
