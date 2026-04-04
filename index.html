@@ -8,16 +8,15 @@
 <style>
 /* --- General Styles --- */
 html, body {margin:0; padding:0; height:100%; width:100%;}
-body {font-family:'Inter', system-ui, sans-serif; color:white; overflow-x:hidden;}
-
-/* FULLSCREEN GRADIENT */
 body {
+  font-family:'Inter', system-ui, sans-serif;
+  color:white;
+  overflow-x:hidden;
+  min-height:100vh;
   background: linear-gradient(-45deg, #667eea, #764ba2, #ff758c, #ff7eb3);
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
-  min-height: 100vh;
 }
-
 @keyframes gradientBG {
   0%{background-position:0% 50%;}
   50%{background-position:100% 50%;}
@@ -55,7 +54,7 @@ input[type="range"] {width:90%;}
 
 /* Text tool */
 .box {max-width:360px; margin:auto; display:flex; flex-direction:column; gap:10px;}
-textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px;}
+textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; resize:none;}
 
 /* GIF tool */
 .gif-list {max-width:360px; margin:10px auto; display:flex; flex-direction:column; gap:10px;}
@@ -105,8 +104,8 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px;}
     <button onclick="generateGif()">Generate GIF</button>
   </div>
   <div class="control">
-    Resolution: <input type="range" id="gifRes" min="100" max="960" value="540">
-    <span id="gifResVal">540</span>
+    Resolution: <input type="range" id="gifRes" min="10" max="100" value="50">
+    <span id="gifResVal">50%</span>
   </div>
   <div class="control">
     Speed: <span id="speedVal">5.00</span>
@@ -205,7 +204,7 @@ const speedVal=document.getElementById("speedVal");
 const gifRes=document.getElementById("gifRes");
 const gifResVal=document.getElementById("gifResVal");
 speed.oninput=()=>{speedVal.textContent=parseFloat(speed.value).toFixed(2);};
-gifRes.oninput=()=>{gifResVal.textContent=gifRes.value;};
+gifRes.oninput=()=>{gifResVal.textContent=gifRes.value+"%";};
 
 function pickGif(){
   const i=document.createElement("input");
@@ -230,23 +229,37 @@ function renderList(){
 
 function clearGif(){ gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; }
 
-function generateGif(){
+async function generateGif(){
   if(!gifImgs.length) return;
-  const gif=new GIF({workers:2,quality:1,width:parseInt(gifRes.value),height:parseInt(gifRes.value*16/9)});
-  let loaded=0;
-  gifImgs.forEach(file=>{
+  gifList.style.display="none";
+  gifPreview.src="";
+  const images=[];
+
+  for(const file of gifImgs){
     const img=new Image();
     img.src=URL.createObjectURL(file);
-    img.onload=()=>{
-      const delay=1000/(parseFloat(speed.value)||1);
-      gif.addFrame(img,{delay});
-      loaded++;
-      if(loaded===gifImgs.length){
-        gif.on('finished',blob=>{gifPreview.src=URL.createObjectURL(blob);});
-        gif.render();
-      }
-    };
+    await img.decode();
+    images.push(img);
+  }
+
+  const gif=new GIF({
+    workers:2,
+    quality:1,
+    width: images[0].width*gifRes.value/100,
+    height: images[0].height*gifRes.value/100
   });
+
+  images.forEach(img=>{
+    const delay=1000/(parseFloat(speed.value)||1);
+    gif.addFrame(img,{delay});
+  });
+
+  gif.on('finished',blob=>{
+    gifPreview.src=URL.createObjectURL(blob);
+    gifList.style.display="flex";
+  });
+
+  gif.render();
 }
 </script>
 
