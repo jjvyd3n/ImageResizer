@@ -3,266 +3,307 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TikTok Resizer</title>
-
+<title>Image Toolkit Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
 <style>
+/* FULL SCREEN GRADIENT FIXED */
+html, body {
+  html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100vh; /* viewport height */
+  min-height: 100vh; /* ensure minimum height */
+}
+
 body {
-  margin:0;
-  font-family: system-ui;
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-  min-height:100vh;
+  display:flex; flex-direction:column;
+  min-height:100vh; /* ensures gradient fills viewport */
+  background: linear-gradient(270deg,#667eea,#764ba2,#ff758c,#ff7eb3);
+  background-size: 600% 600%;
+  animation: gradientBG 20s ease infinite;
   color:white;
+  font-family:'Inter',system-ui,sans-serif;
 }
 
-h1 {
-  text-align:center;
-  padding:15px 10px 5px;
-  font-size:20px;
-}
+@keyframes gradientBG {0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
 
-/* TOP BAR */
-.topbar {
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  flex-wrap:wrap;
-  padding-bottom:10px;
-}
+/* HEADER */
+h1 {text-align:center; font-size:28px; font-weight:800; letter-spacing:-0.5px; padding:20px 10px 10px;}
 
-button {
-  padding:8px 14px;
+/* NAV / TABS */
+.nav {display:flex; justify-content:center; gap:8px; padding:10px 0 0; position:relative;}
+.nav button {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
+  color:white;
   border:none;
-  border-radius:8px;
-  font-weight:600;
-  cursor:pointer;
-}
-
-.active {
-  background:black;
-  color:white;
-}
-
-/* DROP AREA */
-#drop {
-  margin:15px;
-  padding:30px;
-  border:2px dashed white;
-  border-radius:12px;
-  text-align:center;
-}
-
-/* GALLERY */
-.gallery {
-  max-width:420px;
-  margin:auto;
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-  padding-bottom:40px;
-}
-
-.item {
+  padding:6px 10px;
+  border-radius:10px;
+  transition: all 0.3s ease;
   position:relative;
-  border-radius:12px;
-  overflow:hidden;
-  animation: fade 0.3s ease;
+  font-weight:500;
 }
-
-.item img {
-  width:100%;
-  display:block;
-}
-
-/* DELETE */
-.delete {
+.nav button.active {color:black; font-weight:700;}
+.nav button.active::after {
+  content:"";
   position:absolute;
-  top:6px;
-  right:6px;
-  background:red;
-  color:white;
-  font-size:12px;
+  bottom:-3px;
+  left:0;
+  width:100%;
+  height:3px;
+  background:white;
+  border-radius:2px;
+  transition: all 0.3s ease;
 }
 
-/* FULLSCREEN VIEWER */
-.viewer {
-  position:fixed;
-  inset:0;
-  background:black;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:100;
-}
+/* SECTIONS */
+.section {display:none; flex:1; padding:12px; opacity:0; transform:translateY(5px); transition: all 0.4s ease;}
+.section.active {display:flex; flex-direction:column; opacity:1; transform:translateY(0);}
 
-.viewer img {
-  max-width:100%;
-  max-height:100%;
-}
+/* BUTTONS */
+button {border:none; border-radius:10px; padding:7px 10px; cursor:pointer; transition:transform 0.2s ease;}
+button:active {transform:scale(0.95);}
+.red {background:#ff4d4d; color:white;}
 
-/* ANIMATION */
-@keyframes fade {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1;}
-}
+/* GALLERY & DROP */
+.gallery {max-width:360px; margin:15px auto; display:flex; flex-direction:column; gap:8px; overflow-y:auto;}
+.item {position:relative; opacity:0; animation: fadeIn 0.4s forwards;}
+.item img {width:100%; cursor:pointer; border-radius:10px;}
+.delete {position:absolute; top:6px; right:6px; background:#ff4d4d; color:white; font-size:12px; cursor:pointer;}
+.drop {margin:15px auto; max-width:360px; padding:22px; border:2px dashed rgba(255,255,255,0.5); border-radius:12px; text-align:center; cursor:pointer; transition: all 0.2s ease;}
+.drop:hover {background:rgba(255,255,255,0.05);}
+
+/* INPUTS */
+.control {max-width:300px; margin:10px auto; text-align:center; font-size:14px;}
+input[type="range"] {width:70%; margin-right:6px;}
+input[type="number"] {width:60px;}
+.box {max-width:360px; margin:20px auto 0; display:flex; flex-direction:column; gap:10px;}
+textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; resize:none;}
+
+/* GIF LIST */
+.gif-list {display:flex; flex-wrap:wrap; gap:8px; max-width:360px; margin:10px auto;}
+.gif-item {position:relative; width:100px; height:100px; overflow:hidden; border-radius:12px;}
+.gif-item img {width:100%; height:100%; object-fit:cover; cursor:pointer;}
+#gifPreview {max-width:360px; margin:10px auto; border-radius:12px; display:block;}
+.pulse {animation: pulse 1s infinite;}
+@keyframes pulse {0%{opacity:0.3;}50%{opacity:1;}100%{opacity:0.3;}}
+@keyframes fadeIn {0%{opacity:0; transform:translateY(5px);} 100%{opacity:1; transform:translateY(0);}}
 </style>
 </head>
 <body>
 
-<h1>TikTok 9:16 Resizer</h1>
+<h1>Image Toolkit Pro</h1>
 
-<div class="topbar">
-  <button id="stretch">Stretch</button>
-  <button id="fit">Fit</button>
-  <button id="clear">Clear</button>
+<div class="nav">
+  <button class="active" onclick="show('resizer',this)">(9:16) Image Resizer</button>
+  <button onclick="show('text',this)">Upside Down Text Generator</button>
+  <button onclick="show('gif',this)">GIF Generator</button>
 </div>
 
-<div id="drop">Tap or Drop Images</div>
+<!-- IMAGE RESIZER -->
+<div id="resizer" class="section active">
+  <div class="control">
+    Resolution: <input type="range" id="quality" min="10" max="100" value="100">
+    <span id="qval">100%</span>
+  </div>
+  <div class="control"><button id="clear" class="red">Clear All</button></div>
+  <div class="drop" onclick="pick()">Tap or Drop Images</div>
+  <div class="gallery" id="gallery"></div>
+</div>
 
-<div class="gallery" id="gallery"></div>
+<!-- UPSIDE DOWN TEXT -->
+<div id="text" class="section">
+  <div class="box">
+    <input id="input" placeholder="Type here...">
+    <label><input type="checkbox" id="flip"> Upside Down</label>
+    <label><input type="checkbox" id="reverse"> Reverse</label>
+    <textarea id="out" rows="4" readonly></textarea>
+    <button onclick="copyText()">Copy</button>
+  </div>
+</div>
 
-<div class="viewer" id="viewer">
-  <img id="viewerImg">
+<!-- GIF GENERATOR -->
+<div id="gif" class="section">
+  <div class="drop" onclick="pickGif()">Tap or Drop Images</div>
+  <div class="gif-list" id="gifList"></div>
+  <div class="control">
+    <button class="red" onclick="clearGif()">Clear All</button>
+    <button onclick="generateGif()">Generate GIF</button>
+  </div>
+  <div class="control">
+    Speed (sec/frame):
+    <input type="range" id="speed" min="0.01" max="10" step="0.01" value="5">
+    <input type="number" id="speedNum" min="0.01" max="10" step="0.01" value="5">
+    <span id="speedVal">5.00</span>
+  </div>
+  <div id="gifStatus" style="text-align:center; margin:8px 0;"></div>
+  <img id="gifPreview">
 </div>
 
 <script>
-let mode = localStorage.getItem("mode") || "stretch";
-let bgColor = "white";
-
-const stretchBtn = document.getElementById("stretch");
-const fitBtn = document.getElementById("fit");
-const clearBtn = document.getElementById("clear");
-const gallery = document.getElementById("gallery");
-const drop = document.getElementById("drop");
-
-const viewer = document.getElementById("viewer");
-const viewerImg = document.getElementById("viewerImg");
-
-/* UI STATE */
-function updateUI(){
-  stretchBtn.classList.toggle("active", mode==="stretch");
-  fitBtn.classList.toggle("active", mode==="fit");
+// TABS
+function show(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
 }
-updateUI();
 
-/* BUTTONS */
-stretchBtn.onclick = () => {
-  mode="stretch";
-  localStorage.setItem("mode", mode);
-  updateUI();
-};
+// IMAGE RESIZER
+const gallery=document.getElementById("gallery");
+const quality=document.getElementById("quality");
+const qval=document.getElementById("qval");
+quality.oninput=()=>{ qval.textContent=quality.value+"%"; };
 
-fitBtn.onclick = () => {
-  mode="fit";
-  localStorage.setItem("mode", mode);
-  updateUI();
-};
+function pick(){
+  const i=document.createElement("input"); i.type="file"; i.multiple=true; i.accept="image/*";
+  i.onchange=e=>handleFiles(e.target.files); i.click();
+}
 
-clearBtn.onclick = () => gallery.innerHTML = "";
-
-/* FILE INPUT */
-drop.onclick = () => {
-  const input = document.createElement("input");
-  input.type="file";
-  input.multiple=true;
-  input.accept="image/*";
-  input.onchange = e => handleFiles(e.target.files);
-  input.click();
-};
-
-/* HANDLE FILES */
 function handleFiles(files){
-  [...files].forEach(file=>{
-    const reader = new FileReader();
-    reader.onload = e=>{
-      const img = new Image();
-      img.onload = ()=>process(img);
-      img.src = e.target.result;
+  [...files].forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=new Image();
+      img.onload=()=>processImg(img);
+      img.src=e.target.result;
     };
-    reader.readAsDataURL(file);
+    r.readAsDataURL(f);
   });
 }
 
-/* PROCESS IMAGE */
-function process(img){
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-
-  const W = 540;
-  const H = 960;
-
-  canvas.width = W;
-  canvas.height = H;
-
-  if(mode==="stretch"){
-    ctx.drawImage(img,0,0,W,H);
-  } else {
-    // blur background
-    ctx.filter="blur(25px)";
-    ctx.drawImage(img,0,0,W,H);
-    ctx.filter="none";
-
-    const scale = Math.min(W/img.width, H/img.height);
-    const w = img.width*scale;
-    const h = img.height*scale;
-
-    const x = (W-w)/2;
-    const y = (H-h)/2;
-
-    ctx.drawImage(img,0,0,img.width,img.height,x,y,w,h);
-  }
-
-  const url = canvas.toDataURL("image/png");
-
-  const div = document.createElement("div");
+function processImg(img){
+  const canvasWidth=360;
+  const canvasHeight=640;
+  const c=document.createElement("canvas");
+  c.width=canvasWidth;
+  c.height=canvasHeight;
+  const ctx=c.getContext("2d");
+  const scale = Math.max(canvasWidth/img.width, canvasHeight/img.height);
+  const w = img.width * scale;
+  const h = img.height * scale;
+  const x = (canvasWidth - w)/2;
+  const y = (canvasHeight - h)/2;
+  ctx.drawImage(img, x, y, w, h);
+  const url=c.toDataURL("image/jpeg", quality.value/100);
+  const div=document.createElement("div");
   div.className="item";
+  const image=document.createElement("img"); image.src=url;
+  image.onclick=()=>download(url,"resized.jpg");
+  const del=document.createElement("button"); del.textContent="X"; del.className="delete";
+  del.onclick=()=>div.remove();
+  div.appendChild(image); div.appendChild(del); gallery.appendChild(div);
+}
+document.getElementById("clear").onclick=()=>gallery.innerHTML="";
+function download(src,name){const a=document.createElement("a"); a.href=src; a.download=name; a.click();}
 
-  const image = document.createElement("img");
-  image.src = url;
+// TEXT TOOL
+const input=document.getElementById("input");
+const flip=document.getElementById("flip");
+const reverse=document.getElementById("reverse");
+const out=document.getElementById("out");
+const upsideMap = {"a":"ɐ","b":"q","c":"ɔ","d":"p","e":"ǝ","f":"ɟ","g":"ƃ","h":"ɥ","i":"ᴉ","j":"ɾ","k":"ʞ","l":"l","m":"ɯ","n":"u","o":"o","p":"d","q":"b","r":"ɹ","s":"s","t":"ʇ","u":"n","v":"ʌ","w":"ʍ","x":"x","y":"ʎ","z":"z","A":"∀","B":"𐐒","C":"Ɔ","D":"p","E":"Ǝ","F":"Ⅎ","G":"פ","H":"H","I":"I","J":"ſ","K":"ʞ","L":"˥","M":"W","N":"N","O":"O","P":"Ԁ","Q":"Q","R":"ɹ","S":"S","T":"⊥","U":"∩","V":"Λ","W":"M","X":"X","Y":"⅄","Z":"Z"};
+input.oninput=updateText; flip.onchange=updateText; reverse.onchange=updateText;
+function updateText(){
+  let v=input.value;
+  if(reverse.checked) v=v.split('').reverse().join('');
+  if(flip.checked) v=v.split('').map(c=>upsideMap[c]||c).join('');
+  out.value=v;
+}
+function copyText(){navigator.clipboard.writeText(out.value);}
 
-  /* FULLSCREEN */
-  image.onclick = ()=>{
-    viewer.style.display="flex";
-    viewerImg.src = url;
-  };
+// GIF GENERATOR FIXED TO 9:16
+let gifImgs=[];
+const gifList=document.getElementById("gifList");
+const gifPreview=document.getElementById("gifPreview");
+const gifStatus=document.getElementById("gifStatus");
+const speed=document.getElementById("speed");
+const speedNum=document.getElementById("speedNum");
+const speedVal=document.getElementById("speedVal");
 
-  /* DELETE */
-  const del = document.createElement("button");
-  del.textContent="X";
-  del.className="delete";
-  del.onclick = ()=>div.remove();
+speed.oninput=()=>{ speedVal.textContent=parseFloat(speed.value).toFixed(2); speedNum.value=parseFloat(speed.value).toFixed(2);}
+speedNum.oninput=()=>{
+  let v=parseFloat(speedNum.value);
+  if(v<0.01)v=0.01; if(v>10)v=10;
+  speed.value=v; speedVal.textContent=v.toFixed(2);
+};
 
-  div.appendChild(image);
-  div.appendChild(del);
-  gallery.appendChild(div);
+function pickGif(){
+  const i=document.createElement("input"); i.type="file"; i.multiple=true; i.accept="image/*";
+  i.onchange=e=>{gifImgs=[...gifImgs,...e.target.files]; renderGifList();};
+  i.click();
 }
 
-/* VIEWER CLOSE */
-viewer.onclick = ()=> viewer.style.display="none";
+function renderGifList(){
+  gifList.innerHTML="";
+  gifImgs.forEach((file,index)=>{
+    const div=document.createElement("div"); div.className="gif-item";
+    const img=document.createElement("img"); img.src=URL.createObjectURL(file);
+    const del=document.createElement("button"); del.textContent="X"; del.className="delete";
+    del.onclick=()=>{gifImgs.splice(index,1); renderGifList();};
+    div.appendChild(img); div.appendChild(del); gifList.appendChild(div);
+  });
+}
 
-/* SWIPE */
-let startX = 0;
+function clearGif(){ gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; gifStatus.textContent=""; }
 
-viewer.addEventListener("touchstart", e=>{
-  startX = e.touches[0].clientX;
-});
+function generateGif(){
+  if(!gifImgs.length) return;
+  gifList.style.display="none";
+  gifPreview.src=""; 
+  gifStatus.textContent="Generating GIF..."; gifStatus.classList.add("pulse");
 
-viewer.addEventListener("touchend", e=>{
-  let endX = e.changedTouches[0].clientX;
+  const images = [];
+  let loaded = 0;
 
-  if(Math.abs(startX-endX)>50){
-    let imgs = [...document.querySelectorAll(".item img")];
-    let i = imgs.findIndex(img=>img.src===viewerImg.src);
+  gifImgs.forEach(f=>{
+    const img = new Image();
+    img.onload = () => {
+      loaded++;
+      if(loaded === gifImgs.length){
+        // Convert each image to 9:16 PNG frame
+        const frames = images.map(i=>{
+          const c = document.createElement("canvas");
+          const canvasWidth=360, canvasHeight=640;
+          c.width=canvasWidth; c.height=canvasHeight;
+          const ctx=c.getContext("2d");
+          const scale = Math.max(canvasWidth/i.width, canvasHeight/i.height);
+          const w=i.width*scale;
+          const h=i.height*scale;
+          ctx.drawImage(i,(canvasWidth-w)/2,(canvasHeight-h)/2,w,h);
+          return c.toDataURL("image/png");
+        });
+        createGif(frames);
+      }
+    };
+    img.src = URL.createObjectURL(f);
+    images.push(img);
+  });
+}
 
-    if(startX > endX && i < imgs.length-1){
-      viewerImg.src = imgs[i+1].src;
+function createGif(images){
+  gifshot.createGIF({
+    images: images,
+    gifWidth: 360,
+    gifHeight: 640,
+    interval: parseFloat(speed.value),
+    numFrames: images.length,
+    progressCallback: p=>{gifStatus.textContent="Generating GIF... "+Math.round(p*100)+"%";}
+  }, function(obj){
+    gifStatus.classList.remove("pulse");
+    if(!obj.error){
+      gifPreview.src=obj.image;
+      gifStatus.textContent="GIF Ready! Tap to Save.";
+      gifImgs=[]; gifList.innerHTML=""; gifList.style.display="flex";
+      gifPreview.onclick=()=>download(obj.image,"animated.gif");
+    } else {
+      gifStatus.textContent="GIF Generation Failed.";
+      gifList.style.display="flex";
     }
-
-    if(startX < endX && i > 0){
-      viewerImg.src = imgs[i-1].src;
-    }
-  }
-});
+  });
+}
 </script>
-
 </body>
 </html>
