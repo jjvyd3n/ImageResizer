@@ -7,17 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
 <style>
-/* --- Reset & Font --- */
+/* --- Reset & font --- */
 * {box-sizing:border-box; margin:0; padding:0;}
-html, body {height:100%; width:100%; overflow-x:hidden; font-family:'Inter',system-ui,sans-serif; color:white;}
-body {display:flex; flex-direction:column; min-height:100vh;}
+html, body {height:100%; width:100%; font-family:'Inter',system-ui,sans-serif; overflow-x:hidden; color:white;}
 
-/* --- Fullscreen gradient --- */
+/* --- Fullscreen gradient background --- */
 #gradientBG {
   position:fixed;
   top:0; left:0;
-  width:100%;
-  height:100%;
+  width:100%; height:100%;
   z-index:-1;
   background: linear-gradient(120deg, #667eea, #764ba2, #ff758c, #ff7eb3);
   background-size: 600% 600%;
@@ -30,99 +28,28 @@ body {display:flex; flex-direction:column; min-height:100vh;}
 }
 
 /* --- Headings --- */
-h1 {
-  text-align:center;
-  font-size:28px;
-  font-weight:800;
-  letter-spacing:-0.5px;
-  padding:20px 10px 10px;
-  z-index:1;
-}
+h1 {text-align:center; font-size:28px; font-weight:800; padding:20px 10px 10px; z-index:1;}
 
 /* --- Tabs --- */
-.nav {
-  display:flex; justify-content:center; gap:12px; padding:10px 0 20px; position:relative; z-index:1;
-}
-.nav button {
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(6px);
-  color:white;
-  border:none;
-  padding:8px 14px;
-  border-radius:12px;
-  transition: all 0.3s ease;
-  font-weight:500;
-}
-.nav button.active {
-  color:black;
-  background: rgba(255,255,255,0.7);
-}
-.nav::after {
-  content:'';
-  position:absolute;
-  bottom:0;
-  left:0;
-  width:100%;
-  height:2px;
-  background: rgba(255,255,255,0.3);
-}
+.nav {display:flex; justify-content:center; gap:12px; padding:10px 0 20px; position:relative; z-index:1;}
+.nav button {background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); color:white; border:none; padding:8px 14px; border-radius:12px; font-weight:500; transition: all 0.3s ease;}
+.nav button.active {color:black; background: rgba(255,255,255,0.7);}
+.nav::after {content:''; position:absolute; bottom:0; left:0; width:100%; height:2px; background: rgba(255,255,255,0.3);}
 
 /* --- Sections --- */
-.section {
-  display:none; flex-direction:column; gap:12px;
-  margin:auto;
-  max-width:420px;
-  padding:16px;
-  border-radius:16px;
-  background: rgba(0,0,0,0.25);
-  backdrop-filter: blur(8px);
-  transition: opacity 0.4s ease;
-  position:relative;
-  z-index:1;
-}
-.section.active {display:flex;}
+.section {display:none; flex-direction:column; gap:12px; margin:auto; max-width:420px; padding:16px; border-radius:16px; background: rgba(0,0,0,0.25); backdrop-filter: blur(8px);}
+.section.active {display:flex; transition: opacity 0.4s ease;}
 
 /* --- Drop Boxes --- */
-.drop {
-  padding:20px;
-  border:2px dashed rgba(255,255,255,0.5);
-  border-radius:16px;
-  text-align:center;
-  cursor:pointer;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
+.drop {padding:20px; border:2px dashed rgba(255,255,255,0.5); border-radius:16px; text-align:center; cursor:pointer; transition: transform 0.2s ease, background 0.2s ease;}
 .drop:hover {background: rgba(255,255,255,0.1);}
 
 /* --- Gallery --- */
-.gallery, .gif-list {
-  max-width:360px;
-  margin:10px auto;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  overflow-y:auto;
-}
+.gallery, .gif-list {max-width:360px; margin:10px auto; display:flex; flex-direction:column; gap:8px; overflow-y:auto;}
 .item, .gif-item {position:relative;}
-.item img, .gif-item img {
-  width:100%;
-  border-radius:12px;
-  transition: transform 0.25s ease, filter 0.25s ease;
-}
-.item img:hover, .gif-item img:hover {
-  transform: scale(1.03);
-  filter: brightness(1.1);
-}
-.delete {
-  position:absolute;
-  top:6px; right:6px;
-  background:#ff4d4d;
-  color:white;
-  font-size:12px;
-  cursor:pointer;
-  border:none;
-  border-radius:6px;
-  padding:2px 6px;
-}
+.item img, .gif-item img {width:100%; border-radius:12px; transition: transform 0.25s ease, filter 0.25s ease;}
+.item img:hover, .gif-item img:hover {transform: scale(1.03); filter: brightness(1.1);}
+.delete {position:absolute; top:6px; right:6px; background:#ff4d4d; color:white; font-size:12px; cursor:pointer; border:none; border-radius:6px; padding:2px 6px;}
 
 /* --- Controls --- */
 .control {max-width:300px; margin:10px auto; text-align:center; font-size:14px;}
@@ -133,55 +60,17 @@ button:active {transform:scale(0.95);}
 .red {background:#ff4d4d; color:white;}
 
 /* --- Upside Down Text Box --- */
-#text .box {
-  max-width:100%;
-  margin:0 auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-#text textarea, #text input {
-  width:100%;
-  font-size:16px;
-  text-align:center;
-  border-radius:12px;
-  padding:10px;
-  background: rgba(0,0,0,0.2);
-  backdrop-filter: blur(6px);
-  color:white;
-  resize:none;
-  box-sizing:border-box;
-}
+#text .box {max-width:100%; margin:0 auto; display:flex; flex-direction:column; gap:10px;}
+#text textarea, #text input {width:100%; font-size:16px; text-align:center; border-radius:12px; padding:10px; background: rgba(0,0,0,0.2); backdrop-filter: blur(6px); color:white; resize:none; box-sizing:border-box;}
 
 /* --- Toggles aligned properly --- */
-#text .toggles {
-  display:flex;
-  justify-content:center;
-  gap:20px;
-  margin-bottom:10px;
-}
-#text .toggle-item {
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:14px;
-}
-#text .toggle-item input[type="checkbox"] {
-  transform: scale(1.2);
-  cursor:pointer;
-}
-#text .toggle-item label {
-  cursor:pointer;
-  margin:0;
-}
+#text .toggles {display:flex; justify-content:center; gap:20px; margin-bottom:10px;}
+#text .toggle-item {display:flex; align-items:center; gap:6px; font-size:14px;}
+#text .toggle-item input[type="checkbox"] {transform: scale(1.2); cursor:pointer;}
+#text .toggle-item label {cursor:pointer; margin:0;}
 
 /* --- GIF Preview --- */
-#gifPreview {
-  max-width:360px; 
-  margin:10px auto; 
-  border-radius:12px; 
-  display:block;
-}
+#gifPreview {max-width:360px; margin:10px auto; border-radius:12px; display:block;}
 .pulse {animation: pulse 1s infinite;}
 @keyframes pulse {0%{opacity:0.3;}50%{opacity:1;}100%{opacity:0.3;}}
 </style>
