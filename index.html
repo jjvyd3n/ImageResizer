@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Image Toolkit Pro</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
 
@@ -14,62 +15,62 @@ body {
   color:white;
   display:flex; flex-direction:column;
   min-height:100vh;
-  background: linear-gradient(135deg,#667eea,#764ba2,#ff758c);
-  overflow-x:hidden;
+  background: linear-gradient(270deg,#667eea,#764ba2,#ff758c,#ff7eb3);
+  background-size:600% 600%;
+  animation:gradientBG 20s ease infinite;
+}
+@keyframes gradientBG {
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
 
-/* HEADER */
 h1 {text-align:center; font-size:28px; font-weight:800; padding:20px 10px 10px;}
 
-/* NAV */
-.nav {display:flex; justify-content:center; gap:10px; position:relative;}
+.nav {display:flex; justify-content:center; gap:8px; padding:10px 0;}
 .nav button {
-  background: rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.15);
   color:white;
   border:none;
-  padding:8px 12px;
+  padding:6px 10px;
   border-radius:10px;
-  transition: all 0.3s ease;
+  position:relative;
 }
-.nav button.active {color:black; font-weight:700;}
-.nav button.active::after {
+.nav button.active {color:black;}
+.nav button.active::after{
   content:"";
   position:absolute;
-  bottom:-4px;
-  height:3px;
-  width:100%;
+  bottom:-3px;
   left:0;
+  width:100%;
+  height:3px;
   background:white;
 }
 
-/* SECTIONS */
-.section {display:none; flex:1; padding:12px; opacity:0; transition:0.4s;}
-.section.active {display:flex; flex-direction:column; opacity:1;}
+.section {display:none; flex:1; padding:12px;}
+.section.active {display:flex; flex-direction:column;}
 
-/* UI */
 button {border:none; border-radius:10px; padding:7px 10px; cursor:pointer;}
 .red {background:#ff4d4d;}
+
+.gallery {max-width:360px; margin:15px auto; display:flex; flex-direction:column; gap:8px;}
+.item {position:relative;}
+.item img {width:100%;}
+.delete {position:absolute; top:6px; right:6px;}
+
+.drop {margin:15px auto; max-width:360px; padding:22px; border:2px dashed white; border-radius:12px; text-align:center; cursor:pointer;}
+
 .control {max-width:300px; margin:10px auto; text-align:center;}
-input[type="range"] {width:70%;}
 .box {max-width:360px; margin:auto; display:flex; flex-direction:column; gap:10px;}
 textarea, input {border:none; border-radius:10px; padding:10px;}
 
-/* GALLERY */
-.gallery {max-width:360px; margin:15px auto; display:flex; flex-direction:column; gap:8px;}
-.item {position:relative;}
-.item img {width:100%; border-radius:10px;}
-.delete {position:absolute; top:5px; right:5px;}
-
-/* DROP */
-.drop {margin:15px auto; max-width:360px; padding:20px; border:2px dashed white; text-align:center; border-radius:12px; cursor:pointer;}
-
-/* GIF */
 .gif-list {display:flex; flex-wrap:wrap; gap:8px; max-width:360px; margin:10px auto;}
-.gif-item {width:80px; height:80px; overflow:hidden; border-radius:10px;}
+.gif-item {width:80px; height:80px;}
 .gif-item img {width:100%; height:100%; object-fit:cover;}
-#gifPreview {max-width:360px; margin:auto; border-radius:10px;}
+
+#gifPreview {max-width:360px; margin:10px auto; display:block;}
 .pulse {animation:pulse 1s infinite;}
-@keyframes pulse {0%{opacity:.3;}50%{opacity:1;}100%{opacity:.3;}}
+@keyframes pulse {0%{opacity:0.3;}50%{opacity:1;}100%{opacity:0.3;}}
 </style>
 </head>
 
@@ -78,9 +79,9 @@ textarea, input {border:none; border-radius:10px; padding:10px;}
 <h1>Image Toolkit Pro</h1>
 
 <div class="nav">
-  <button class="active" onclick="show('resizer',this)">9:16 Resizer</button>
-  <button onclick="show('text',this)">Text</button>
-  <button onclick="show('gif',this)">GIF</button>
+  <button class="active" onclick="show('resizer',this)">(9:16) Image Resizer</button>
+  <button onclick="show('text',this)">Upside Down Text Generator</button>
+  <button onclick="show('gif',this)">GIF Generator</button>
 </div>
 
 <!-- RESIZER -->
@@ -92,35 +93,36 @@ textarea, input {border:none; border-radius:10px; padding:10px;}
   </div>
 
   <div class="control">
-    <button class="red" onclick="gallery.innerHTML=''">Clear</button>
+    <button id="clear" class="red">Clear All</button>
   </div>
 
-  <div class="drop" onclick="pick()">Tap / Upload</div>
+  <div class="drop" onclick="pick()">Tap or Drop Images</div>
   <div class="gallery" id="gallery"></div>
 </div>
 
 <!-- TEXT -->
 <div id="text" class="section">
   <div class="box">
-    <input id="input" placeholder="Type...">
-    <label><input type="checkbox" id="flip"> Upside</label>
+    <input id="input" placeholder="Type here...">
+    <label><input type="checkbox" id="flip"> Upside Down</label>
     <label><input type="checkbox" id="reverse"> Reverse</label>
-    <textarea id="out"></textarea>
+    <textarea id="out" rows="4" readonly></textarea>
+    <button onclick="copyText()">Copy</button>
   </div>
 </div>
 
 <!-- GIF -->
 <div id="gif" class="section">
-  <div class="drop" onclick="pickGif()">Upload Images</div>
+  <div class="drop" onclick="pickGif()">Tap or Drop Images</div>
   <div class="gif-list" id="gifList"></div>
 
   <div class="control">
-    <button class="red" onclick="clearGif()">Clear</button>
-    <button onclick="generateGif()">Generate</button>
+    <button class="red" onclick="clearGif()">Clear All</button>
+    <button onclick="generateGif()">Generate GIF</button>
   </div>
 
   <div class="control">
-    Speed:
+    Speed (sec/frame):
     <input type="range" id="speed" min="0.01" max="10" step="0.01" value="5">
   </div>
 
@@ -141,11 +143,14 @@ function show(id,btn){
 const gallery=document.getElementById("gallery");
 const quality=document.getElementById("quality");
 const qval=document.getElementById("qval");
+
 quality.oninput=()=>qval.textContent=quality.value+"%";
+
+document.getElementById("clear").onclick=()=>gallery.innerHTML="";
 
 function pick(){
   const i=document.createElement("input");
-  i.type="file"; i.multiple=true;
+  i.type="file"; i.multiple=true; i.accept="image/*";
   i.onchange=e=>{
     [...e.target.files].forEach(f=>{
       const r=new FileReader();
@@ -160,6 +165,7 @@ function pick(){
   i.click();
 }
 
+// 🔥 FIXED QUALITY (pixelation)
 function processImg(img){
   const baseW=360, baseH=640;
   const q=quality.value/100;
@@ -170,11 +176,18 @@ function processImg(img){
   const sctx=small.getContext("2d");
 
   const scale=Math.max(small.width/img.width,small.height/img.height);
-  sctx.drawImage(img,0,0,img.width*scale,img.height*scale);
+  const w=img.width*scale;
+  const h=img.height*scale;
+  const x=(small.width-w)/2;
+  const y=(small.height-h)/2;
+
+  sctx.drawImage(img,x,y,w,h);
 
   const final=document.createElement("canvas");
-  final.width=baseW; final.height=baseH;
+  final.width=baseW;
+  final.height=baseH;
   const fctx=final.getContext("2d");
+
   fctx.imageSmoothingEnabled=false;
   fctx.drawImage(small,0,0,baseW,baseH);
 
@@ -191,25 +204,41 @@ function processImg(img){
   del.textContent="X"; del.className="delete";
   del.onclick=()=>div.remove();
 
-  div.appendChild(im); div.appendChild(del);
+  div.appendChild(im);
+  div.appendChild(del);
   gallery.appendChild(div);
 }
 
 function download(src){
   const a=document.createElement("a");
-  a.href=src; a.download="image.jpg"; a.click();
+  a.href=src; a.download="resized.jpg"; a.click();
 }
 
 // TEXT
 const input=document.getElementById("input");
+const flip=document.getElementById("flip");
+const reverse=document.getElementById("reverse");
 const out=document.getElementById("out");
-input.oninput=()=>out.value=input.value.split('').reverse().join('');
+
+input.oninput=updateText;
+flip.onchange=updateText;
+reverse.onchange=updateText;
+
+function updateText(){
+  let v=input.value;
+  if(reverse.checked) v=v.split('').reverse().join('');
+  if(flip.checked) v=v.split('').reverse().join('');
+  out.value=v;
+}
+
+function copyText(){navigator.clipboard.writeText(out.value);}
 
 // GIF
 let gifImgs=[];
 const gifList=document.getElementById("gifList");
 const gifPreview=document.getElementById("gifPreview");
 const gifStatus=document.getElementById("gifStatus");
+const speed=document.getElementById("speed");
 
 function pickGif(){
   const i=document.createElement("input");
@@ -224,16 +253,25 @@ function pickGif(){
 function renderGif(){
   gifList.innerHTML="";
   gifImgs.forEach((f,i)=>{
+    const div=document.createElement("div");
+    div.className="gif-item";
+
     const img=document.createElement("img");
     img.src=URL.createObjectURL(f);
-    img.onclick=()=>gifImgs.splice(i,1)||renderGif();
-    gifList.appendChild(img);
+
+    div.onclick=()=>{gifImgs.splice(i,1); renderGif();};
+
+    div.appendChild(img);
+    gifList.appendChild(div);
   });
 }
 
-function clearGif(){gifImgs=[]; gifList.innerHTML="";}
+function clearGif(){gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; gifStatus.textContent="";}
 
+// 🔥 FIXED GIF (no crash)
 function generateGif(){
+  if(!gifImgs.length) return;
+
   gifStatus.textContent="Generating...";
   gifStatus.classList.add("pulse");
 
@@ -252,12 +290,19 @@ function generateGif(){
 }
 
 function createGif(images){
+  const MAX=480;
+
   const processed=images.map(img=>{
+    const scale=Math.min(1,MAX/Math.max(img.width,img.height));
+    const w=img.width*scale;
+    const h=img.height*scale;
+
     const c=document.createElement("canvas");
-    const size=480;
-    c.width=size; c.height=size;
+    c.width=w; c.height=h;
+
     const ctx=c.getContext("2d");
-    ctx.drawImage(img,0,0,size,size);
+    ctx.drawImage(img,0,0,w,h);
+
     return c.toDataURL("image/jpeg",0.8);
   });
 
@@ -266,9 +311,11 @@ function createGif(images){
     interval:parseFloat(speed.value)
   },obj=>{
     gifStatus.classList.remove("pulse");
+
     if(!obj.error){
       gifPreview.src=obj.image;
-      gifStatus.textContent="Done!";
+      gifStatus.textContent="GIF Ready!";
+      gifPreview.onclick=()=>download(obj.image);
     } else {
       gifStatus.textContent="Failed";
     }
