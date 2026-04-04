@@ -4,154 +4,42 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Image Toolkit Pro</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
 <style>
-/* --- General Reset & Fonts --- */
 html, body {margin:0; padding:0; height:100%; width:100%;}
 body {
   font-family:'Inter',system-ui,sans-serif;
   color:white;
-  display:flex;
-  flex-direction:column;
+  display:flex; flex-direction:column;
   min-height:100vh;
+  background: #4B6CB7; /* solid techie blue */
   overflow-x:hidden;
   overflow-y:auto;
-  /* Animated gradient background filling full viewport */
-  background: linear-gradient(120deg, #667eea, #764ba2, #ff758c, #ff7eb3);
-  background-size: 600% 600%;
-  animation: gradientBG 20s ease infinite;
 }
-@keyframes gradientBG {
-  0% {background-position:0% 50%;}
-  50% {background-position:100% 50%;}
-  100% {background-position:0% 50%;}
-}
-
-/* --- Headings --- */
-h1 {
-  text-align:center;
-  font-size:28px;
-  font-weight:800;
-  letter-spacing:-0.5px;
-  padding:20px 10px 10px;
-}
-
-/* --- Navigation Tabs --- */
-.nav {
-  display:flex; 
-  justify-content:center; 
-  gap:12px; 
-  padding:10px 0 20px; 
-  position:relative;
-}
-.nav button {
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(6px);
-  color:white;
-  border:none;
-  padding:8px 14px;
-  border-radius:12px;
-  transition: all 0.3s ease;
-  font-weight:500;
-}
-.nav button.active {
-  color:black;
-  background: rgba(255,255,255,0.7);
-}
-
-/* --- Sections --- */
-.section {
-  display:none; 
-  flex-direction:column; 
-  gap:12px;
-  margin:auto;
-  max-width:400px;
-  padding:12px;
-  border-radius:16px;
-  background: rgba(0,0,0,0.2);
-  backdrop-filter: blur(8px);
-  transition: opacity 0.4s ease;
-}
-.section.active {display:flex;}
-
-/* --- Drop Boxes --- */
-.drop {
-  padding:20px;
-  border:2px dashed rgba(255,255,255,0.5);
-  border-radius:16px;
-  text-align:center;
-  cursor:pointer;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-.drop:hover {background: rgba(255,255,255,0.1);}
-
-/* --- Gallery --- */
-.gallery, .gif-list {
-  max-width:360px;
-  margin:15px auto;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  overflow-y:auto;
-}
-.item, .gif-item {position:relative;}
-.item img, .gif-item img {
-  width:100%;
-  border-radius:12px;
-  transition: transform 0.25s ease, filter 0.25s ease;
-}
-.item img:hover, .gif-item img:hover {
-  transform: scale(1.03);
-  filter: brightness(1.1);
-}
-.delete {
-  position:absolute;
-  top:6px; right:6px;
-  background:#ff4d4d;
-  color:white;
-  font-size:12px;
-  cursor:pointer;
-  border:none;
-  border-radius:6px;
-  padding:2px 6px;
-}
-
-/* --- Controls --- */
-.control {max-width:300px; margin:10px auto; text-align:center; font-size:14px;}
-input[type="range"] {width:70%; margin-right:6px;}
-input[type="number"] {width:60px;}
+h1 {text-align:center; font-size:28px; font-weight:800; letter-spacing:-0.5px; padding:20px 10px 10px;}
+.nav {display:flex; justify-content:center; gap:8px; padding:10px 0 20px;}
+.nav button {background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); color:white; border:none; padding:6px 10px; border-radius:10px; transition: transform 0.2s ease;}
+.nav button.active {color:black;}
+.section {display:none; flex:1; padding:12px; transition:opacity 0.4s ease-in-out;}
+.section.active {display:flex; flex-direction:column;}
 button {border:none; border-radius:10px; padding:7px 10px; cursor:pointer; transition:transform 0.2s ease;}
 button:active {transform:scale(0.95);}
 .red {background:#ff4d4d; color:white;}
-
-/* --- Upside Down Text Box Emphasis --- */
-#text .box {
-  max-width:320px;
-  margin:0 auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-#text textarea, #text input {
-  width:100%;
-  font-size:16px;
-  text-align:center;
-  border-radius:12px;
-  padding:10px;
-  background: rgba(0,0,0,0.2);
-  backdrop-filter: blur(6px);
-  color:white;
-  resize:none;
-}
-
-/* --- GIF Preview --- */
-#gifPreview {
-  max-width:360px; 
-  margin:10px auto; 
-  border-radius:12px; 
-  display:block;
-}
+.gallery {max-width:360px; margin:15px auto; display:flex; flex-direction:column; gap:8px; overflow-y:auto;}
+.item {position:relative;}
+.item img {width:100%; cursor:pointer;}
+.delete {position:absolute; top:6px; right:6px; background:#ff4d4d; color:white; font-size:12px; cursor:pointer;}
+.drop {margin:15px auto; max-width:360px; padding:22px; border:2px dashed rgba(255,255,255,0.5); border-radius:12px; text-align:center; cursor:pointer;}
+.control {max-width:300px; margin:10px auto; text-align:center; font-size:14px;}
+input[type="range"] {width:70%; margin-right:6px;}
+input[type="number"] {width:60px;}
+.box {max-width:360px; margin:auto; display:flex; flex-direction:column; gap:10px;}
+textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; resize:none;}
+.gif-list {display:flex; flex-wrap:wrap; gap:8px; max-width:360px; margin:10px auto;}
+.gif-item {position:relative; width:80px; height:80px; overflow:hidden; border-radius:12px;}
+.gif-item img {width:100%; height:100%; object-fit:cover; cursor:pointer;}
+#gifPreview {max-width:360px; margin:10px auto; border-radius:12px; display:block;}
 .pulse {animation: pulse 1s infinite;}
 @keyframes pulse {0%{opacity:0.3;}50%{opacity:1;}100%{opacity:0.3;}}
 </style>
@@ -207,7 +95,7 @@ button:active {transform:scale(0.95);}
 </div>
 
 <script>
-// --- Tabs ---
+// TABS
 function show(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -215,7 +103,7 @@ function show(id,btn){
   btn.classList.add('active');
 }
 
-// --- Image Resizer ---
+// IMAGE RESIZER
 const gallery=document.getElementById("gallery");
 const quality=document.getElementById("quality");
 const qval=document.getElementById("qval");
@@ -257,7 +145,7 @@ function processImg(img){
 document.getElementById("clear").onclick=()=>gallery.innerHTML="";
 function download(src,name){const a=document.createElement("a"); a.href=src; a.download=name; a.click();}
 
-// --- Upside Down Text ---
+// TEXT TOOL
 const input=document.getElementById("input");
 const flip=document.getElementById("flip");
 const reverse=document.getElementById("reverse");
@@ -272,7 +160,7 @@ function updateText(){
 }
 function copyText(){navigator.clipboard.writeText(out.value);}
 
-// --- GIF Generator ---
+// GIF GENERATOR
 let gifImgs=[];
 const gifList=document.getElementById("gifList");
 const gifPreview=document.getElementById("gifPreview");
