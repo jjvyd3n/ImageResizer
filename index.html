@@ -9,19 +9,16 @@
 <style>
 html, body {margin:0; padding:0; height:100%; width:100%;}
 body {
-margin: 0;
-font-family: system-ui, sans-serif;
-background: linear-gradient(-45deg, #667eea, #764ba2, #ff758c, #ff7eb3);
-background-size: 400% 400%;
-animation: gradientBG 15s ease infinite;
-color: #fff;
+  font-family:'Inter',system-ui,sans-serif;
+  color:white;
+  display:flex; flex-direction:column;
+  min-height:100vh;
+  background: linear-gradient(270deg,#667eea,#764ba2,#ff758c,#ff7eb3);
+  background-size: 600% 600%;
+  animation: gradientBG 20s ease infinite;
+  overflow-x:hidden; overflow-y:auto;
 }
-
-@keyframes gradientBG {
-0% {background-position:0% 50%;}
-50% {background-position:100% 50%;}
-100% {background-position:0% 50%;}
-}
+@keyframes gradientBG {0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
 
 h1 {text-align:center; font-size:28px; font-weight:800; letter-spacing:-0.5px; padding:20px 10px 10px;}
 
@@ -127,6 +124,7 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; 
 </div>
 
 <script>
+// TABS
 function show(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -138,7 +136,7 @@ function show(id,btn){
 const gallery=document.getElementById("gallery");
 const quality=document.getElementById("quality");
 const qval=document.getElementById("qval");
-quality.oninput=()=>{ qval.textContent=quality.value+"%"; }; // resolution slider only
+quality.oninput=()=>{ qval.textContent=quality.value+"%"; }; // slider display only
 
 function pick(){
   const i=document.createElement("input"); i.type="file"; i.multiple=true; i.accept="image/*";
@@ -179,7 +177,6 @@ function processImg(img){
   del.onclick=()=>div.remove();
   div.appendChild(image); div.appendChild(del); gallery.appendChild(div);
 }
-
 document.getElementById("clear").onclick=()=>gallery.innerHTML="";
 function download(src,name){const a=document.createElement("a"); a.href=src; a.download=name; a.click();}
 
@@ -198,11 +195,14 @@ function updateText(){
 }
 function copyText(){navigator.clipboard.writeText(out.value);}
 
-// GIF GENERATOR FIXED
+// GIF GENERATOR FIXED TO 9:16
 let gifImgs=[];
 const gifList=document.getElementById("gifList");
 const gifPreview=document.getElementById("gifPreview");
 const gifStatus=document.getElementById("gifStatus");
+const speed=document.getElementById("speed");
+const speedNum=document.getElementById("speedNum");
+const speedVal=document.getElementById("speedVal");
 
 speed.oninput=()=>{ speedVal.textContent=parseFloat(speed.value).toFixed(2); speedNum.value=parseFloat(speed.value).toFixed(2);}
 speedNum.oninput=()=>{
@@ -244,15 +244,19 @@ function generateGif(){
     img.onload = () => {
       loaded++;
       if(loaded === gifImgs.length){
-        // convert all images to PNG dataURL for lossless quality
-        const pngFrames = images.map(i => {
+        // Convert each image to 9:16 PNG frame
+        const frames = images.map(i=>{
           const c = document.createElement("canvas");
-          c.width = i.width; 
-          c.height = i.height;
-          c.getContext("2d").drawImage(i,0,0,i.width,i.height);
+          const canvasWidth=360, canvasHeight=640;
+          c.width=canvasWidth; c.height=canvasHeight;
+          const ctx=c.getContext("2d");
+          const scale = Math.max(canvasWidth/i.width, canvasHeight/i.height);
+          const w=i.width*scale;
+          const h=i.height*scale;
+          ctx.drawImage(i,(canvasWidth-w)/2,(canvasHeight-h)/2,w,h);
           return c.toDataURL("image/png");
         });
-        createGif(pngFrames);
+        createGif(frames);
       }
     };
     img.src = URL.createObjectURL(f);
