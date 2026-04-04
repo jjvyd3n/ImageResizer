@@ -89,6 +89,9 @@ textarea:active, input:active {transform:scale(1.02);}
 .pulse {animation: pulse 1s infinite;}
 @keyframes pulse {0%{opacity:0.3;}50%{opacity:1;}100%{opacity:0.3;}}
 @keyframes fadeIn {0%{opacity:0; transform:translateY(5px);} 100%{opacity:1; transform:translateY(0);}}
+
+/* TEXT TOOL TOP ALIGN */
+#text .box {margin-top:20px;}
 </style>
 </head>
 <body>
@@ -180,15 +183,12 @@ function processImg(img){
   c.width=canvasWidth;
   c.height=canvasHeight;
   const ctx=c.getContext("2d");
-
-  // Stretch image to 9:16, entire image visible
   const scale = Math.max(canvasWidth/img.width, canvasHeight/img.height);
   const w = img.width * scale;
   const h = img.height * scale;
   const x = (canvasWidth - w)/2;
   const y = (canvasHeight - h)/2;
   ctx.drawImage(img, x, y, w, h);
-
   const url=c.toDataURL("image/jpeg", quality.value/100);
   const div=document.createElement("div");
   div.className="item";
@@ -216,11 +216,12 @@ function updateText(){
 }
 function copyText(){navigator.clipboard.writeText(out.value);}
 
-// GIF GENERATOR
+// GIF GENERATOR FIXED
 let gifImgs=[];
 const gifList=document.getElementById("gifList");
 const gifPreview=document.getElementById("gifPreview");
 const gifStatus=document.getElementById("gifStatus");
+
 const speed=document.getElementById("speed");
 const speedNum=document.getElementById("speedNum");
 const speedVal=document.getElementById("speedVal");
