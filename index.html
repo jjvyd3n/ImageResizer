@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Toolkit Pro (9:16 Format)</title>
+<title>Image Toolkit Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* --- General Styles --- */
@@ -13,6 +13,8 @@ body {
   color:white;
   overflow-x:hidden;
   min-height:100vh;
+  display:flex;
+  flex-direction:column;
   background: linear-gradient(-45deg, #667eea, #764ba2, #ff758c, #ff7eb3);
   background-size: 400% 400%;
   animation: gradientBG 15s ease infinite;
@@ -31,15 +33,17 @@ h1 {text-align:center; font-size:28px; font-weight:700; letter-spacing:-0.5px; p
 .nav button {
   background: rgba(255,255,255,0.15); backdrop-filter: blur(6px);
   color:white; border:none; padding:6px 10px; border-radius:10px; position:relative; z-index:1;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
 }
 .nav button.active {color:black;}
 .nav::after {content:""; position:absolute; bottom:0; left:0; height:3px; width:0; background:white; border-radius:2px; transition:0.3s all ease;}
 
 /* Section */
-.section {display:none; padding:12px;}
-.section.active {display:block; transition: opacity 0.4s ease-in-out;}
-button {border:none; border-radius:10px; padding:7px 10px; cursor:pointer;}
+.section {display:none; padding:12px; transition:opacity 0.4s ease-in-out;}
+.section.active {display:block;}
+
+/* Buttons */
+button {border:none; border-radius:10px; padding:7px 10px; cursor:pointer; transition:transform 0.2s ease;}
 button:active {transform:scale(0.95);}
 .red {background:#ff4d4d; color:white;}
 
@@ -60,11 +64,12 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; 
 .gif-list {max-width:360px; margin:10px auto; display:flex; flex-direction:column; gap:10px;}
 .gif-item {position:relative; border-radius:12px; overflow:hidden; cursor:pointer; background:white; padding:2px;}
 .gif-item img {width:100%; display:block;}
+#gifPreview {max-width:360px; margin:10px auto; border-radius:12px; display:block;}
 </style>
 </head>
 <body>
 
-<h1>Image Toolkit Pro (9:16 Format)</h1>
+<h1>Image Toolkit Pro</h1>
 
 <div class="nav" id="nav">
   <button class="active" onclick="show('resizer',this)">Resizer</button>
@@ -111,6 +116,7 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; 
     Speed: <span id="speedVal">5.00</span>
     <input type="range" id="speed" min="0" max="10" step="0.01" value="5">
   </div>
+  <div id="gifStatus" style="text-align:center; margin:8px 0;"></div>
   <img id="gifPreview">
 </div>
 
@@ -184,13 +190,29 @@ const input=document.getElementById("input");
 const flip=document.getElementById("flip");
 const reverse=document.getElementById("reverse");
 const out=document.getElementById("out");
+
+const upsideMap = {
+  "a":"ɐ","b":"q","c":"ɔ","d":"p","e":"ǝ","f":"ɟ","g":"ƃ","h":"ɥ","i":"ᴉ","j":"ɾ",
+  "k":"ʞ","l":"l","m":"ɯ","n":"u","o":"o","p":"d","q":"b","r":"ɹ","s":"s","t":"ʇ",
+  "u":"n","v":"ʌ","w":"ʍ","x":"x","y":"ʎ","z":"z",
+  "A":"∀","B":"𐐒","C":"Ɔ","D":"p","E":"Ǝ","F":"Ⅎ","G":"פ","H":"H","I":"I","J":"ſ",
+  "K":"ʞ","L":"˥","M":"W","N":"N","O":"O","P":"Ԁ","Q":"Q","R":"ɹ","S":"S","T":"⊥",
+  "U":"∩","V":"Λ","W":"M","X":"X","Y":"⅄","Z":"Z",
+  "0":"0","1":"Ɩ","2":"ᄅ","3":"Ɛ","4":"ㄣ","5":"ϛ","6":"9","7":"ㄥ","8":"8","9":"6",
+  ".":".",",":"'",'"':',',"?":"¿","!":"¡","'":",","`":",","(":")",")":"(","[":"]","]":"[",
+  "{":"}","}":"{","<":">",">":"<","&":"⅋","_":"‾"
+};
+
 input.oninput=update;
 flip.onchange=update;
 reverse.onchange=update;
+
 function update(){
   let v=input.value;
-  if(reverse.checked)v=v.split('').reverse().join('');
-  if(flip.checked)v=v.split('').map(c=>c.charCodeAt(0)).map(c=>0xFFFF-c).map(c=>String.fromCharCode(c)).join('');
+  if(reverse.checked) v=v.split('').reverse().join('');
+  if(flip.checked){
+    v=v.split('').map(c=>upsideMap[c]||c).reverse().join('');
+  }
   out.value=v;
 }
 function copy(){navigator.clipboard.writeText(out.value);}
@@ -199,6 +221,7 @@ function copy(){navigator.clipboard.writeText(out.value);}
 let gifImgs=[];
 const gifList=document.getElementById("gifList");
 const gifPreview=document.getElementById("gifPreview");
+const gifStatus=document.getElementById("gifStatus");
 const speed=document.getElementById("speed");
 const speedVal=document.getElementById("speedVal");
 const gifRes=document.getElementById("gifRes");
@@ -227,14 +250,14 @@ function renderList(){
   });
 }
 
-function clearGif(){ gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; }
+function clearGif(){ gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; gifStatus.textContent=""; }
 
 async function generateGif(){
   if(!gifImgs.length) return;
   gifList.style.display="none";
   gifPreview.src="";
+  gifStatus.textContent="Generating GIF...";
   const images=[];
-
   for(const file of gifImgs){
     const img=new Image();
     img.src=URL.createObjectURL(file);
@@ -256,12 +279,12 @@ async function generateGif(){
 
   gif.on('finished',blob=>{
     gifPreview.src=URL.createObjectURL(blob);
+    gifStatus.textContent="GIF Ready! Tap to Save.";
     gifList.style.display="flex";
   });
 
   gif.render();
 }
 </script>
-
 </body>
 </html>
