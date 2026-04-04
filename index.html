@@ -7,21 +7,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gifshot/0.3.2/gifshot.min.js"></script>
 <style>
-html, body {margin:0; padding:0; height:100%; width:100%;}
-body {
-  font-family:'Inter',system-ui,sans-serif;
-  color:white;
-  display:flex; flex-direction:column;
-  min-height:100vh;
+/* FULL SCREEN GRADIENT */
+html, body {
+  margin:0; padding:0; height:100%; width:100%;
   background: linear-gradient(270deg,#667eea,#764ba2,#ff758c,#ff7eb3);
   background-size: 600% 600%;
   animation: gradientBG 20s ease infinite;
+  font-family:'Inter',system-ui,sans-serif;
+  color:white;
+  display:flex; flex-direction:column;
   overflow-x:hidden; overflow-y:auto;
 }
 @keyframes gradientBG {0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
 
+/* HEADER */
 h1 {text-align:center; font-size:28px; font-weight:800; letter-spacing:-0.5px; padding:20px 10px 10px;}
 
+/* NAV / TABS */
 .nav {display:flex; justify-content:center; gap:8px; padding:10px 0 0; position:relative;}
 .nav button {
   background: rgba(255,255,255,0.15);
@@ -47,13 +49,16 @@ h1 {text-align:center; font-size:28px; font-weight:800; letter-spacing:-0.5px; p
   transition: all 0.3s ease;
 }
 
+/* SECTIONS */
 .section {display:none; flex:1; padding:12px; opacity:0; transform:translateY(5px); transition: all 0.4s ease;}
 .section.active {display:flex; flex-direction:column; opacity:1; transform:translateY(0);}
 
+/* BUTTONS */
 button {border:none; border-radius:10px; padding:7px 10px; cursor:pointer; transition:transform 0.2s ease;}
 button:active {transform:scale(0.95);}
 .red {background:#ff4d4d; color:white;}
 
+/* GALLERY & DROP */
 .gallery {max-width:360px; margin:15px auto; display:flex; flex-direction:column; gap:8px; overflow-y:auto;}
 .item {position:relative; opacity:0; animation: fadeIn 0.4s forwards;}
 .item img {width:100%; cursor:pointer; border-radius:10px;}
@@ -61,12 +66,14 @@ button:active {transform:scale(0.95);}
 .drop {margin:15px auto; max-width:360px; padding:22px; border:2px dashed rgba(255,255,255,0.5); border-radius:12px; text-align:center; cursor:pointer; transition: all 0.2s ease;}
 .drop:hover {background:rgba(255,255,255,0.05);}
 
+/* INPUTS */
 .control {max-width:300px; margin:10px auto; text-align:center; font-size:14px;}
 input[type="range"] {width:70%; margin-right:6px;}
 input[type="number"] {width:60px;}
 .box {max-width:360px; margin:20px auto 0; display:flex; flex-direction:column; gap:10px;}
 textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; resize:none;}
 
+/* GIF LIST */
 .gif-list {display:flex; flex-wrap:wrap; gap:8px; max-width:360px; margin:10px auto;}
 .gif-item {position:relative; width:100px; height:100px; overflow:hidden; border-radius:12px;}
 .gif-item img {width:100%; height:100%; object-fit:cover; cursor:pointer;}
@@ -86,6 +93,7 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; 
   <button onclick="show('gif',this)">GIF Generator</button>
 </div>
 
+<!-- IMAGE RESIZER -->
 <div id="resizer" class="section active">
   <div class="control">
     Resolution: <input type="range" id="quality" min="10" max="100" value="100">
@@ -96,6 +104,7 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; 
   <div class="gallery" id="gallery"></div>
 </div>
 
+<!-- UPSIDE DOWN TEXT -->
 <div id="text" class="section">
   <div class="box">
     <input id="input" placeholder="Type here...">
@@ -106,6 +115,7 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px; 
   </div>
 </div>
 
+<!-- GIF GENERATOR -->
 <div id="gif" class="section">
   <div class="drop" onclick="pickGif()">Tap or Drop Images</div>
   <div class="gif-list" id="gifList"></div>
@@ -136,7 +146,7 @@ function show(id,btn){
 const gallery=document.getElementById("gallery");
 const quality=document.getElementById("quality");
 const qval=document.getElementById("qval");
-quality.oninput=()=>{ qval.textContent=quality.value+"%"; }; // slider display only
+quality.oninput=()=>{ qval.textContent=quality.value+"%"; };
 
 function pick(){
   const i=document.createElement("input"); i.type="file"; i.multiple=true; i.accept="image/*";
@@ -267,6 +277,8 @@ function generateGif(){
 function createGif(images){
   gifshot.createGIF({
     images: images,
+    gifWidth: 360,
+    gifHeight: 640,
     interval: parseFloat(speed.value),
     numFrames: images.length,
     progressCallback: p=>{gifStatus.textContent="Generating GIF... "+Math.round(p*100)+"%";}
