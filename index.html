@@ -6,19 +6,18 @@
 <title>Image Toolkit Pro (9:16 Format)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+/* --- General Styles --- */
 html, body {margin:0; padding:0; height:100%; width:100%;}
 body {font-family:'Inter', system-ui, sans-serif; color:white; overflow-x:hidden;}
 
-/* Fullscreen gradient */
-body::before {
-  content:"";
-  position:fixed;
-  inset:0;
-  z-index:-1;
+/* FULLSCREEN GRADIENT */
+body {
   background: linear-gradient(-45deg, #667eea, #764ba2, #ff758c, #ff7eb3);
-  background-size:400% 400%;
-  animation:gradientBG 15s ease infinite;
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  min-height: 100vh;
 }
+
 @keyframes gradientBG {
   0%{background-position:0% 50%;}
   50%{background-position:100% 50%;}
@@ -28,7 +27,7 @@ body::before {
 /* Title */
 h1 {text-align:center; font-size:28px; font-weight:700; letter-spacing:-0.5px; padding:20px 10px 10px;}
 
-/* Tabs with sliding underline */
+/* Tabs */
 .nav {display:flex; justify-content:center; gap:8px; position:relative; padding:10px 0 20px;}
 .nav button {
   background: rgba(255,255,255,0.15); backdrop-filter: blur(6px);
@@ -48,7 +47,7 @@ button:active {transform:scale(0.95);}
 /* Resizer */
 .gallery {max-width:360px; margin:15px auto; display:flex; flex-direction:column; gap:14px;}
 .item {position:relative; border-radius:12px; overflow:hidden;}
-.item img {width:100%;}
+.item img {width:100%; display:block;}
 .delete {position:absolute; top:6px; right:6px; background:#ff4d4d; color:white; font-size:12px;}
 .drop {margin:15px auto; max-width:360px; padding:22px; border:2px dashed rgba(255,255,255,0.5); border-radius:12px; text-align:center; cursor:pointer;}
 .control {max-width:300px; margin:10px auto; text-align:center; font-size:14px;}
@@ -60,8 +59,8 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px;}
 
 /* GIF tool */
 .gif-list {max-width:360px; margin:10px auto; display:flex; flex-direction:column; gap:10px;}
-.gif-item {position:relative; border-radius:12px; overflow:hidden; cursor:grab;}
-.gif-item img {width:100%;}
+.gif-item {position:relative; border-radius:12px; overflow:hidden; cursor:pointer; background:white; padding:2px;}
+.gif-item img {width:100%; display:block;}
 </style>
 </head>
 <body>
@@ -91,7 +90,8 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px;}
   <div class="box">
     <input id="input" placeholder="Type here...">
     <label><input type="checkbox" id="flip"> Upside Down</label>
-    <textarea id="out" rows="4"></textarea>
+    <label><input type="checkbox" id="reverse"> Reverse</label>
+    <textarea id="out" rows="4" readonly></textarea>
     <button onclick="copy()">Copy</button>
   </div>
 </div>
@@ -104,7 +104,12 @@ textarea, input {border:none; border-radius:10px; padding:10px; font-size:14px;}
     <button class="red" onclick="clearGif()">Clear All</button>
     <button onclick="generateGif()">Generate GIF</button>
   </div>
-  <div class="control">Speed: <span id="speedVal">5.00</span>
+  <div class="control">
+    Resolution: <input type="range" id="gifRes" min="100" max="960" value="540">
+    <span id="gifResVal">540</span>
+  </div>
+  <div class="control">
+    Speed: <span id="speedVal">5.00</span>
     <input type="range" id="speed" min="0" max="10" step="0.01" value="5">
   </div>
   <img id="gifPreview">
@@ -178,11 +183,14 @@ document.getElementById("clear").onclick=()=>gallery.innerHTML="";
 /* TEXT TOOL */
 const input=document.getElementById("input");
 const flip=document.getElementById("flip");
+const reverse=document.getElementById("reverse");
 const out=document.getElementById("out");
 input.oninput=update;
 flip.onchange=update;
+reverse.onchange=update;
 function update(){
   let v=input.value;
+  if(reverse.checked)v=v.split('').reverse().join('');
   if(flip.checked)v=v.split('').map(c=>c.charCodeAt(0)).map(c=>0xFFFF-c).map(c=>String.fromCharCode(c)).join('');
   out.value=v;
 }
@@ -194,7 +202,10 @@ const gifList=document.getElementById("gifList");
 const gifPreview=document.getElementById("gifPreview");
 const speed=document.getElementById("speed");
 const speedVal=document.getElementById("speedVal");
+const gifRes=document.getElementById("gifRes");
+const gifResVal=document.getElementById("gifResVal");
 speed.oninput=()=>{speedVal.textContent=parseFloat(speed.value).toFixed(2);};
+gifRes.oninput=()=>{gifResVal.textContent=gifRes.value;};
 
 function pickGif(){
   const i=document.createElement("input");
@@ -209,19 +220,10 @@ function pickGif(){
 function renderList(){
   gifList.innerHTML="";
   gifImgs.forEach((file,index)=>{
-    const div=document.createElement("div"); div.className="gif-item"; div.draggable=true;
+    const div=document.createElement("div"); div.className="gif-item";
     const img=document.createElement("img"); img.src=URL.createObjectURL(file);
     const del=document.createElement("button"); del.textContent="X"; del.className="delete";
     del.onclick=()=>{gifImgs.splice(index,1); renderList();};
-    div.ondragstart=e=>{ e.dataTransfer.setData("index",index); };
-    div.ondragover=e=>e.preventDefault();
-    div.ondrop=e=>{
-      const from=e.dataTransfer.getData("index");
-      const temp=gifImgs[from];
-      gifImgs.splice(from,1);
-      gifImgs.splice(index,0,temp);
-      renderList();
-    };
     div.appendChild(img); div.appendChild(del); gifList.appendChild(div);
   });
 }
@@ -230,7 +232,7 @@ function clearGif(){ gifImgs=[]; gifList.innerHTML=""; gifPreview.src=""; }
 
 function generateGif(){
   if(!gifImgs.length) return;
-  const gif=new GIF({workers:2,quality:1,width:540,height:960});
+  const gif=new GIF({workers:2,quality:1,width:parseInt(gifRes.value),height:parseInt(gifRes.value*16/9)});
   let loaded=0;
   gifImgs.forEach(file=>{
     const img=new Image();
